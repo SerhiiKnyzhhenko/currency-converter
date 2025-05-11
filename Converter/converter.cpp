@@ -1,18 +1,14 @@
 #include "classes.h"
+#include <memory>
+#include <unordered_map>
 
-class converter {
-private:
-	token token1;
-	token token2;
 
-public:
-	converter();
-	~converter();
-};
+converter::converter() : 
+	token1(std::make_unique<token>()),
+	token2(std::make_unique<token>()) { }
 
-converter::converter() {
 
-}
-converter::~converter() {
-
+void converter::convert() {
+	
+	
 }

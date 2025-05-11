@@ -29,5 +29,14 @@
     <ClInclude Include="classes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="token.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,9 +1,7 @@
 #ifndef CLASSES_H
 #define CLASSES_H
 
-class token{};
-class converter {};
-
-
+#include "token.h"
+#include "converter.h"
 
 #endif // !CLASSES_H
