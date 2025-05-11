@@ -3,7 +3,8 @@
 #include <unordered_map>
 
 
-converter::converter() : 
+converter::converter(const currencyRates* rates) :
+	rates(rates),
 	token1(std::make_unique<token>()),
 	token2(std::make_unique<token>()) { }
 

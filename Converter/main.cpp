@@ -5,7 +5,9 @@
 
 int main() {
 	
-	auto converter_ptr{ std::make_unique<converter>() };
+	auto rates_ptr{ std::make_unique<currencyRates>() };
+
+	auto converter_ptr{ std::make_unique<converter>(rates_ptr) };
 	
 
 	return 0;
