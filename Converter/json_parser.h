@@ -12,10 +12,11 @@ public:
 	json_parser(const std::string& file_name);
 	~json_parser();
 
-	std::string get_file();
+	std::string get_file() const;
 	void set_file(const std::string& file_name);
-	void open();
-	void close();
+	void open() const;
+	void read() const;
+	void close() const;
 };
 
 #endif // !JSON_PARSER_H
