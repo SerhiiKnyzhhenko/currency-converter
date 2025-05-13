@@ -1,11 +1,14 @@
 #ifndef JSON_PARSER_H
 #define JSON_PARSER_H
 
+#include <iostream>
+#include <fstream>
 #include <string>
 
 class json_parser {
 private:
-	std::string file;
+	std::string file_name;
+	std::ifstream file;
 
 public:
 	json_parser();
