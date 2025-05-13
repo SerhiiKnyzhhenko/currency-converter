@@ -9,13 +9,13 @@ int main() {
 
 	auto converter_ptr = std::make_unique<converter>(rates_ptr.get());
 	
-	/*std::string curr_from = "JPY";
-	std::string curr_to = "GBP";
-	double val = 22.52;
+	std::string curr_from = "UAH";
+	std::string curr_to = "USD";
+	double val = 500;
 
 	converter_ptr->set_tokens(curr_from, curr_to, val);
 
-	std::cout << converter_ptr->convert() << std::endl;*/
+	std::cout << converter_ptr->convert() << std::endl;
 
 	return 0;
 }
