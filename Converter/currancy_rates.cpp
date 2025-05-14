@@ -9,6 +9,8 @@ currencyRates::currencyRates() {
 
 }
 
+std::unordered_map<std::string, double>& currencyRates::get_rates() { return rates; }
+
 double currencyRates::get_rate(const std::string& currency) const{
 	auto it = rates.find(currency);
 	if (it == rates.end()) {

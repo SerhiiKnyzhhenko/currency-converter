@@ -12,6 +12,7 @@ private:
 
 public:
 	currencyRates();
+	std::unordered_map<std::string, double>& get_rates();
 	double get_rate(const std::string& currency) const;
 	void add_rate(const std::string& currency, double rate);
 

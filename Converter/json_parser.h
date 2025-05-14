@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <unordered_map>
 
 class json_parser {
 private:
@@ -13,13 +14,12 @@ private:
 public:
 	json_parser();
 	json_parser(const std::string& file_name);
-	~json_parser();
+
 
 	std::string get_file() const;
-	void set_file(const std::string& file_name);
-	void open() const;
-	void read() const;
-	void close() const;
+	void set_file_name(const std::string& file_name);
+	void read();
+	/*void read_str() ;*/
 };
 
 #endif // !JSON_PARSER_H
