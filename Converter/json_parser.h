@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
+#include <sstream>
 
 class json_parser {
 private:
@@ -13,12 +14,12 @@ private:
 
 public:
 	json_parser();
-	json_parser(const std::string& file_name);
+	json_parser(const std::string&);
 
-
+	double convert_to(const std::string& str);
 	std::string get_file() const;
-	void set_file_name(const std::string& file_name);
-	void read();
+	void set_file_name(const std::string&);
+	void read_and_add_rates(std::unordered_map<std::string, double>&);
 	/*void read_str() ;*/
 };
 
