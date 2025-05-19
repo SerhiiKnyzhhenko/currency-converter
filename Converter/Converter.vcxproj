@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -76,8 +76,12 @@
     <LibraryPath>C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\12345\source\repos\boost\boost_1_88_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\12345\source\repos\boost;C:\Users\12345\source\repos\boost\boost_1_88_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\12345\source\repos\boost\stage\lib;C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0\stage\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\12345\source\repos\boost;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>C:\Users\12345\source\repos\boost\stage\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -138,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="converter.cpp" />
     <ClCompile Include="currancy_rates.cpp" />
+    <ClCompile Include="https.cpp" />
     <ClCompile Include="json_parser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="token.cpp" />
@@ -147,6 +152,7 @@
     <ClInclude Include="converter.h" />
     <ClInclude Include="currency_rates.h" />
     <ClInclude Include="functions.h" />
+    <ClInclude Include="https.h" />
     <ClInclude Include="json_parser.h" />
     <ClInclude Include="token.h" />
   </ItemGroup>
