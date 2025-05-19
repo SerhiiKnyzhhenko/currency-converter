@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include "classes.h"
+#include "https.h"
 #include <vector>
 
 int main() {
@@ -21,5 +22,8 @@ int main() {
 	j_pars.read_and_add_rates(rates_ptr.get()->get_rates());
 
 	std::cout << rates_ptr.get()->get_rate("BTC");
+
+	//https_get();
+
 	return 0;
 }
