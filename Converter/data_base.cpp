@@ -1,13 +1,19 @@
 #include "data_base.h"
 
+std::string conn = "host=localhost port=5432 dbname=converter user=postgres password =12345Kikki";
+
 data_base::data_base() : connectionObject(conn), worker(connectionObject) {}
 
 pqxx::result data_base::add_resp_to_hash(const std::string& date, std::unordered_map<std::string, double>& rates) {
 	try
 	{
-		pqxx::result response = worker.exec_params(
-			"SELECT * FROM rates WHERE date = '$1'", 
-			date);
+		if (!connectionObject.is_open()) {
+			throw std::runtime_error("Problems with connections to db");
+		}
+
+		pqxx::result response = worker.exec(
+			"SELECT * FROM rates WHERE date = $1",  
+			pqxx::params(date));
 
 		for (const auto& row : response) {
 			std::string currency = row[2].as<std::string>();
@@ -24,18 +30,21 @@ pqxx::result data_base::add_resp_to_hash(const std::string& date, std::unordered
 void data_base::add_to_db_from_hash(const std::string& date, const std::unordered_map<std::string, double>& rates) {
 	try
 	{
+		if (!connectionObject.is_open()) {
+			throw std::runtime_error("Problems with connections to db");
+		}
+
 		for (const auto& element : rates)
 		{
 			std::string currency = element.first;
 			double rate = element.second;
 
-			worker.exec_params(
+			worker.exec(
 				"INSERT INTO rates (date, currency, rate) VALUES ($1, $2, $3)",
-				date, currency, rate);
+				pqxx::params(date, currency, rate));
 
 			worker.commit();
-		}
-		
+		}		
 	}
 	catch (const std::exception& e)
 	{
@@ -46,10 +55,14 @@ void data_base::add_to_db_from_hash(const std::string& date, const std::unordere
 void data_base::add_to_db_row(const std::string& date, const std::string& currency, double rate) {
 	try
 	{
+		if (!connectionObject.is_open()) {
+			throw std::runtime_error("Problems with connections to db");
+		}
+
 		if (isDateValid(date)) {
-			worker.exec_params(
+			worker.exec(
 				"INSERT INTO rates (date, currency, rate) VALUES ($1, $2, $3)",
-				date, currency, rate);
+				pqxx::params(date, currency, rate));
 
 			worker.commit();
 		}

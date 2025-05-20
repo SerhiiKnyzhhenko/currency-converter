@@ -7,7 +7,7 @@
 #include <format>
 #include <regex>
 
-std::string conn = "host=localhost port=5432 dbname=converter user=postgres password =12345Kikki";
+extern std::string conn;
 
 class data_base {
 private:
