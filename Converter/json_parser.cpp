@@ -41,7 +41,7 @@ void json_parser::read_and_add_to_hash(std::unordered_map<std::string, double>& 
 					key_start = line.find(':', pos) + 1;
 					key_end = line.find(',', key_start);
 					std::string str = line.substr(key_start, key_end - key_start);
-					rate = convert_to(str);
+					rate = convert_to_double(str);
 				}
 				if (key != "" && rate > 0)
 					rates[key] = rate;
@@ -50,7 +50,7 @@ void json_parser::read_and_add_to_hash(std::unordered_map<std::string, double>& 
 	}
 }
 
-void json_parser::read_adn_add_to_db(const std::string& date) {
+void json_parser::read_adn_add_to_db(std::string date = "") {
 	if (!file.is_open())
 		std::cout << "File is not open";
 	else {
@@ -63,8 +63,22 @@ void json_parser::read_adn_add_to_db(const std::string& date) {
 			double rate = 0.0;
 			size_t pos = 0;
 
-			while (line.find("USD", pos) != std::string::npos) {
+			if (line.find("\"success\":", pos) != std::string::npos) {
+				pos = line.find("\"success\":", pos);
+				size_t key_start = pos + 10;
+				size_t key_end = line.find(",", key_start);
+				std::string result = line.substr(key_start, key_end - key_start);
+				if (result == "false")
+					return;
+			}
 
+			if (line.find("\"date\":\"", pos) != std::string::npos) {
+				pos = line.find("\"date\":\"", pos);
+				date = line.substr(10, 10);	
+			}
+
+			while (line.find("USD", pos) != std::string::npos) {
+				
 				size_t key_start = pos + 1;
 				pos = line.find("USD", key_start) + 3;
 				size_t key_end = line.find('"', pos);
@@ -74,7 +88,7 @@ void json_parser::read_adn_add_to_db(const std::string& date) {
 					key_start = line.find(':', pos) + 1;
 					key_end = line.find(',', key_start);
 					std::string str = line.substr(key_start, key_end - key_start);
-					rate = convert_to(str);
+					rate = convert_to_double(str);
 				}
 				if (key != "" && rate > 0)
 					db.add_to_db_row(date, key, rate);
@@ -84,14 +98,33 @@ void json_parser::read_adn_add_to_db(const std::string& date) {
 
 }
 
-double json_parser::convert_to(const std::string& str) {
+//std::string json_parser::get_date(const std::string& date) {
+//	size_t pos = date.find("\"date\":\"", pos);
+//	size_t key_start_year = pos + 8;
+//	size_t key_end_year = key_start_year + 4;
+//	size_t key_start_mounth = key_end_year + 1;
+//	size_t key_end_mounth = key_end_mounth + 2;
+//	size_t key_start_day = key_end_mounth + 1;
+//	size_t key_end_day = key_start_day + 2;
+//
+//	int year = convert_to_int(date.substr(key_start_year, key_end_year - key_start_year));
+//	int mounth = convert_to_int(date.substr(key_start_mounth, key_end_mounth - key_start_mounth));
+//	int day = convert_to_int(date.substr(key_start_day, key_end_day - key_start_day));
+//}
 
+
+
+double json_parser::convert_to_double(const std::string& str) {
 	std::istringstream ss(str);
-
 	long double num;
-
 	ss >> num;
+	return num;
+}
 
+int json_parser::convert_to_int(const std::string& str) {
+	std::istringstream ss(str);
+	int num;
+	ss >> num;
 	return num;
 }
 

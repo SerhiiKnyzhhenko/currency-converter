@@ -17,11 +17,12 @@ public:
 	json_parser();
 	json_parser(const std::string&);
 
-	double convert_to(const std::string& str);
+	double convert_to_double(const std::string&);
+	int convert_to_int(const std::string&);
 	std::string get_file() const;
 	void set_file_name(const std::string&);
 	void read_and_add_to_hash(std::unordered_map<std::string, double>&);
-	void read_adn_add_to_db(const std::string&);
+	void read_adn_add_to_db(std::string);
 };
 
 #endif // !JSON_PARSER_H
