@@ -24,27 +24,7 @@ int main() {
 	//j_pars.read_and_add_rates(rates_ptr.get()->get_rates());
 
 	//std::cout << rates_ptr.get()->get_rate("BTC");
-
-    std::string connectionString = "host=localhost port=5432 dbname=converter user=postgres password =12345Kikki";
-
-    try
-    {
-        pqxx::connection connectionObject(connectionString.c_str());
-        pqxx::work worker(connectionObject);
-        pqxx::result response = worker.exec("SELECT * FROM rates WHERE date = '2025-02-22'");
-
-        for (const auto& row : response) {
-            std::cout << "Id: " << row[0].as<int>()
-                << " Date: " << row[1].as<std::string>()
-                << " Currency: " << row[2].as<std::string>()
-                << " Rate: " << row[3].as<double>()
-                << std::endl;
-        }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
+    
 
     system("pause");
 

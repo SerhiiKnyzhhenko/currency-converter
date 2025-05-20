@@ -2,8 +2,23 @@
 
 data_base::data_base() : connectionObject(conn), worker(connectionObject) {}
 
-pqxx::result data_base::new_response(const std::string& response_text) {
+pqxx::result data_base::add_resp_to_hash(const std::string& date, std::unordered_map<std::string, double>& rates) {
+	try
+	{
+		pqxx::result response = worker.exec_params(
+			"SELECT * FROM rates WHERE date = '$1'", 
+			date);
 
+		for (const auto& row : response) {
+			std::string currency = row[2].as<std::string>();
+			double rate = row[3].as<double>();		
+			rates[currency] = rate;
+		}
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+	}	
 }
 
 void data_base::add_to_db_from_hash(const std::string& date, const std::unordered_map<std::string, double>& rates) {
@@ -60,4 +75,12 @@ std::string data_base::get_current_date() {
 bool data_base::isDateValid(const std::string& date) {
 	std::regex pattern(R"(\d{4}-\d{2}-\d{2})");
 	return std::regex_match(date, pattern);
+}
+
+std::string data_base::get_custom_date(int y, int m, int d) {
+	using namespace std::chrono;
+
+	year_month_day ymd{ year(y), month(m), day(d)};
+
+	return std::format("{:%Y-%m-%d}", ymd);
 }
