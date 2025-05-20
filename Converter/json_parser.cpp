@@ -18,7 +18,7 @@ void json_parser::set_file_name(const std::string& f_name) {
 	}
 }
 
-void json_parser::read_and_add_rates(std::unordered_map<std::string, double>& rates) {
+void json_parser::read_and_add_to_hash(std::unordered_map<std::string, double>& rates) {
 	if (!file.is_open())
 		std::cout << "File is not open";
 	else {
@@ -48,7 +48,39 @@ void json_parser::read_and_add_rates(std::unordered_map<std::string, double>& ra
 			}
 		}		
 	}
+}
 
+void json_parser::read_adn_add_to_db(const std::string& date) {
+	if (!file.is_open())
+		std::cout << "File is not open";
+	else {
+
+		data_base db;
+		std::string line;
+
+		while (std::getline(file, line)) {
+
+			double rate = 0.0;
+			size_t pos = 0;
+
+			while (line.find("USD", pos) != std::string::npos) {
+
+				size_t key_start = pos + 1;
+				pos = line.find("USD", key_start) + 3;
+				size_t key_end = line.find('"', pos);
+				std::string key = line.substr(key_start + 7, key_end - pos);
+
+				if (key != "") {
+					key_start = line.find(':', pos) + 1;
+					key_end = line.find(',', key_start);
+					std::string str = line.substr(key_start, key_end - key_start);
+					rate = convert_to(str);
+				}
+				if (key != "" && rate > 0)
+					db.add_to_db_row(date, key, rate);
+			}
+		}
+	}
 
 }
 
