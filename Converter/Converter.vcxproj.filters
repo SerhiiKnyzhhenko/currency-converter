@@ -33,6 +33,9 @@
     <ClCompile Include="https.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="data_base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="classes.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="https.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

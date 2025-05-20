@@ -3,7 +3,8 @@
 #include "classes.h"
 #include "https.h"
 #include <vector>
-#include <pqxx/pqxx>
+#include <string>
+
 
 int main() {
 
@@ -29,14 +30,15 @@ int main() {
     try
     {
         pqxx::connection connectionObject(connectionString.c_str());
-
         pqxx::work worker(connectionObject);
+        pqxx::result response = worker.exec("SELECT * FROM rates WHERE date = '2025-02-22'");
 
-        pqxx::result response = worker.exec("SELECT * FROM rates");
-
-        for (size_t i = 0; i < response.size(); i++)
-        {
-            std::cout << "Id: " << response[i][0] << " Username: " << response[i][1] << " Password: " << response[i][2] << " Email: " << response[i][3] << std::endl;
+        for (const auto& row : response) {
+            std::cout << "Id: " << row[0].as<int>()
+                << " Date: " << row[1].as<std::string>()
+                << " Currency: " << row[2].as<std::string>()
+                << " Rate: " << row[3].as<double>()
+                << std::endl;
         }
     }
     catch (const std::exception& e)

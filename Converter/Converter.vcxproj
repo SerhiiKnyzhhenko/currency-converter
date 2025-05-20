@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClCompile Include="converter.cpp" />
     <ClCompile Include="currancy_rates.cpp" />
+    <ClCompile Include="data_base.cpp" />
     <ClCompile Include="https.cpp" />
     <ClCompile Include="json_parser.cpp" />
     <ClCompile Include="main.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="classes.h" />
     <ClInclude Include="converter.h" />
     <ClInclude Include="currency_rates.h" />
+    <ClInclude Include="data_base.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="https.h" />
     <ClInclude Include="json_parser.h" />
