@@ -3,10 +3,11 @@
 #include "classes.h"
 #include "https.h"
 #include <vector>
+#include <pqxx/pqxx>
 
 int main() {
 
-	auto rates_ptr = std::make_unique<currencyRates>();
+	//auto rates_ptr = std::make_unique<currencyRates>();
 
 	/*auto converter_ptr = std::make_unique<converter>(rates_ptr.get());
 	
@@ -18,10 +19,32 @@ int main() {
 
 	std::cout << converter_ptr->convert() << std::endl;*/
 
-	json_parser j_pars("C:/users/12345/onedrive/desktop/file.json");
-	j_pars.read_and_add_rates(rates_ptr.get()->get_rates());
+	//json_parser j_pars("C:/users/12345/onedrive/desktop/file.json");
+	//j_pars.read_and_add_rates(rates_ptr.get()->get_rates());
 
-	std::cout << rates_ptr.get()->get_rate("BTC");
+	//std::cout << rates_ptr.get()->get_rate("BTC");
+
+    std::string connectionString = "host=localhost port=5432 dbname=converter user=postgres password =12345Kikki";
+
+    try
+    {
+        pqxx::connection connectionObject(connectionString.c_str());
+
+        pqxx::work worker(connectionObject);
+
+        pqxx::result response = worker.exec("SELECT * FROM rates");
+
+        for (size_t i = 0; i < response.size(); i++)
+        {
+            std::cout << "Id: " << response[i][0] << " Username: " << response[i][1] << " Password: " << response[i][2] << " Email: " << response[i][3] << std::endl;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+
+    system("pause");
 
 	//https_get();
 

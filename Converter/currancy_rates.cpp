@@ -2,11 +2,6 @@
 
 currencyRates::currencyRates() {
 	rates["USD"] = 1.0;
-	rates["EUR"] = 0.85;
-	rates["GBP"] = 0.75;
-	rates["JPY"] = 110.0;
-	rates["UAH"] = 41.65;
-
 }
 
 std::unordered_map<std::string, double>& currencyRates::get_rates() { return rates; }
