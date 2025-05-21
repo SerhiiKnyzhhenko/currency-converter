@@ -5,10 +5,9 @@
 
 class apiRequest {
 private:
-	std::string access_key_;
+	std::string access_key_ = "50f2dab13e92481fb0ae68c221ba2716";
 
 public:
-	apiRequest(const std::string&);
 	std::string current_date_request() const;
 	std::string custom_date_request(const std::string&) const;
 };

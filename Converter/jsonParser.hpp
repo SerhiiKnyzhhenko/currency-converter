@@ -6,7 +6,7 @@
 #include <string>
 #include <fstream>
 #include <stdexcept>
-#include "data_base.hpp"
+#include "dataBase.hpp"
 
 
 
@@ -18,7 +18,7 @@ public:
 	explicit jsonParser(const std::string&);
 
 	void write_to_hash(std::unordered_map<std::string, double>&);
-	void write_to_db(data_base&);
+	void write_to_db(dataBase&);
 
 private:
 	nlohmann::json parse_json() const;

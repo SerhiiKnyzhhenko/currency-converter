@@ -147,7 +147,7 @@
     <ClCompile Include="apiRequest.cpp" />
     <ClCompile Include="converter.cpp" />
     <ClCompile Include="currancy_rates.cpp" />
-    <ClCompile Include="data_base.cpp" />
+    <ClCompile Include="dataBase.cpp" />
     <ClCompile Include="httpClient.cpp" />
     <ClCompile Include="jsonParser.cpp" />
     <ClCompile Include="main.cpp" />
@@ -155,11 +155,11 @@
     <ClCompile Include="token.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="api_Request.hpp" />
+    <ClInclude Include="apiRequest.hpp" />
     <ClInclude Include="classes.hpp" />
     <ClInclude Include="converter.hpp" />
     <ClInclude Include="currency_rates.hpp" />
-    <ClInclude Include="data_base.hpp" />
+    <ClInclude Include="dataBase.hpp" />
     <ClInclude Include="functions.hpp" />
     <ClInclude Include="httpClient.hpp" />
     <ClInclude Include="jsonParser.hpp" />

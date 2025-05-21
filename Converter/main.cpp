@@ -5,34 +5,30 @@
 #include <vector>
 #include <string>
 
+std::string file_name = "C:/Users/12345/OneDrive/Desktop/file.json";
 
 int main() {
-
+	
 	auto rates_ptr = std::make_unique<currencyRates>();
 
-	/*auto converter_ptr = std::make_unique<converter>(rates_ptr.get());
 	
-	std::string curr_from = "UAH";
-	std::string curr_to = "USD";
-	double val = 500;
+	// its work!!!!
+	/*httpClient* client = new httpClient("api.currencylayer.com");
+	apiRequest* request = new apiRequest();
+	std::string body = client->get_json_body(request->custom_date_request("2025-01-13"));
+	responseHandler* rp = new responseHandler();
 
-	converter_ptr->set_tokens(curr_from, curr_to, val);
+	rp->save_to_file(body, file_name);*/
 
-	std::cout << converter_ptr->convert() << std::endl;*/
+	dataBase* db = new dataBase();
 
-	jsonParser j_pars("C:/users/12345/onedrive/desktop/file.json");
-	j_pars.write_to_hash(rates_ptr->get_rates());
-	//j_pars.read_and_add_to_hash(rates_ptr.get()->get_rates());
+	/*jsonParser* jpars = new jsonParser(file_name);
+	jpars->write_to_db(*db);*/
 
-	//std::cout << rates_ptr.get()->get_rate("BTC");
-    
-	//data_base db;
+	db->add_resp_to_hash("2025-01-13", rates_ptr.get()->get_rates());
 
-	//std::string date = db.get_current_date();
-
-	//get_json_for_custom_date(date);
-
-
+	for (auto a : rates_ptr.get()->get_rates())
+		std::cout << a.first << " " << a.second << std::endl;
 
     system("pause");
 

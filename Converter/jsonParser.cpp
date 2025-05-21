@@ -19,7 +19,7 @@ void jsonParser::write_to_hash(std::unordered_map<std::string, double>& rates) {
 				std::string currency = key.substr(3); // "AED", "AFN" and else
 				rates[currency] = value.get<double>();
 
-				std::cout << currency << " " << value.get<double>() << std::endl;
+
 			}
 		}
 	}
@@ -28,7 +28,7 @@ void jsonParser::write_to_hash(std::unordered_map<std::string, double>& rates) {
 	}
 }
 
-void jsonParser::write_to_db(data_base& db) {
+void jsonParser::write_to_db(dataBase& db) {
 	try {
 		json data = parse_json();
 		if (!check_success(data)) return;
@@ -39,16 +39,18 @@ void jsonParser::write_to_db(data_base& db) {
 		}
 
 		std::string date = data.value("date", "");
+		if (date == "")
+			date = db.get_current_date();
+
 		for (auto& [key, value] : data["quotes"].items())
 			if (key.size() >= 3 && key.substr(0, 3) == "USD") {
 				std::string currency = key.substr(3); // "AED", "AFN" and else
-				db.add_to_db_row(date, key, value.get<double>());
+				db.add_to_db_row(date, currency, value.get<double>());
 			}			
 		}
 	catch (const std::exception& e) {
 		std::cerr << "DB Error: " << e.what() << std::endl;
 	}
-
 }
 
 json jsonParser::parse_json() const {

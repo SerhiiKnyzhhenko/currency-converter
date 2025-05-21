@@ -1,7 +1,10 @@
 #ifndef CLASSES_H
 #define CLASSES_H
 
-#include "data_base.hpp"
+#include "dataBase.hpp"
+#include "httpClient.hpp"
+#include "apiRequest.hpp"
+#include "responeHandler.hpp"
 #include "jsonParser.hpp"
 #include "currency_rates.hpp"
 #include "token.hpp"

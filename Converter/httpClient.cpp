@@ -1,5 +1,7 @@
 ﻿#include "httpClient.hpp"
 
+//http://api.currencylayer.com/ 
+
 
 httpClient::httpClient(const std::string& host) : resolver_(ioc_), socket_(ioc_), host_(host) {
     // reslove adress and establish a connection
@@ -10,7 +12,7 @@ httpClient::~httpClient() {
     socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both); //close the socket
 }
 
-http::response<beast::http::dynamic_body> httpClient::get(const std::string& target) {
+std::string httpClient::get_json_body(const std::string& target) {
     //creating an HTTP GET request with a target
     http::request<http::string_body> req(http::verb::get, target, 11);
     //Set HTTP header fields
@@ -23,7 +25,7 @@ http::response<beast::http::dynamic_body> httpClient::get(const std::string& tar
     http::response<http::dynamic_body> res;
     http::read(socket_, buffer, res);
 
-    return res;
+    return beast::buffers_to_string(res.body().data());
 }
 
 

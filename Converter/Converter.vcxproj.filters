@@ -33,7 +33,7 @@
     <ClCompile Include="httpClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="data_base.cpp">
+    <ClCompile Include="dataBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="apiRequest.cpp">
@@ -65,10 +65,10 @@
     <ClInclude Include="httpClient.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="data_base.hpp">
+    <ClInclude Include="dataBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="api_Request.hpp">
+    <ClInclude Include="apiRequest.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="responeHandler.hpp">

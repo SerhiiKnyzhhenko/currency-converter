@@ -25,7 +25,7 @@ public:
 	httpClient(const std::string&);
 	~httpClient();
 
-	http::response<beast::http::dynamic_body> get(const std::string&);
+	std::string get_json_body(const std::string&);
 };
 
 #endif // !HTTPS_H_

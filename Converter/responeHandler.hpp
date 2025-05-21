@@ -7,7 +7,7 @@
 class responseHandler {
 public:
 	static void save_to_file(
-		const boost::beast::http::response<boost::beast::http::dynamic_body>&,
+		const std::string&,
 		const std::string&);
 };
 

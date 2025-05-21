@@ -2,7 +2,7 @@
 #include <fstream>
 
 void responseHandler::save_to_file(
-	const boost::beast::http::response<boost::beast::http::dynamic_body>& res,
+	const std::string& res,
 	const std::string& filename
 ) {
 	std::ofstream file(filename);

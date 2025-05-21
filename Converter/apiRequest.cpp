@@ -1,7 +1,5 @@
-#include "api_Request.hpp"
+#include "apiRequest.hpp"
 #include <format>
-
-apiRequest::apiRequest(const std::string& key) : access_key_(key) {}
 
 std::string apiRequest::current_date_request() const {
 	return std::format("/live?access_key={}&format=1", access_key_);
