@@ -27,7 +27,7 @@
     <ClCompile Include="currancy_rates.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="json_parser.cpp">
+    <ClCompile Include="jsonParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="httpClient.cpp">
@@ -59,7 +59,7 @@
     <ClInclude Include="currency_rates.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="json_parser.hpp">
+    <ClInclude Include="jsonParser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="httpClient.hpp">

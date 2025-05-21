@@ -76,11 +76,11 @@
     <LibraryPath>C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;C:\Users\12345\source\repos\boost\boost_1_88_0;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;C:\Users\12345\source\repos\boost\boost_1_88_0;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -149,7 +149,7 @@
     <ClCompile Include="currancy_rates.cpp" />
     <ClCompile Include="data_base.cpp" />
     <ClCompile Include="httpClient.cpp" />
-    <ClCompile Include="json_parser.cpp" />
+    <ClCompile Include="jsonParser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="responseHandler.cpp" />
     <ClCompile Include="token.cpp" />
@@ -162,7 +162,7 @@
     <ClInclude Include="data_base.hpp" />
     <ClInclude Include="functions.hpp" />
     <ClInclude Include="httpClient.hpp" />
-    <ClInclude Include="json_parser.hpp" />
+    <ClInclude Include="jsonParser.hpp" />
     <ClInclude Include="responeHandler.hpp" />
     <ClInclude Include="token.hpp" />
   </ItemGroup>

@@ -20,8 +20,8 @@ int main() {
 
 	std::cout << converter_ptr->convert() << std::endl;*/
 
-	json_parser j_pars("C:/users/12345/onedrive/desktop/file.json");
-	j_pars.read_adn_add_to_db("");
+	jsonParser j_pars("C:/users/12345/onedrive/desktop/file.json");
+	j_pars.write_to_hash(rates_ptr->get_rates());
 	//j_pars.read_and_add_to_hash(rates_ptr.get()->get_rates());
 
 	//std::cout << rates_ptr.get()->get_rate("BTC");
