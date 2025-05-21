@@ -25,7 +25,7 @@ int main() {
 	/*jsonParser* jpars = new jsonParser(file_name);
 	jpars->write_to_db(*db);*/
 
-	db->add_resp_to_hash("2025-01-13", rates_ptr.get()->get_rates());
+	db->add_resp_to_hash("2025-01-13", rates_ptr->get_rates());
 
 	for (auto a : rates_ptr.get()->get_rates())
 		std::cout << a.first << " " << a.second << std::endl;

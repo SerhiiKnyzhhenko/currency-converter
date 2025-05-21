@@ -8,7 +8,7 @@ dataBase::dataBase() : connectionObject(conn), worker(connectionObject) {
 	}
 }
 
-pqxx::result dataBase::add_resp_to_hash(const std::string& date, std::unordered_map<std::string, double>& rates) {
+void dataBase::add_resp_to_hash(const std::string& date, std::unordered_map<std::string, double>& rates) {
 	try
 	{
 		if (!connectionObject.is_open()) {
@@ -16,12 +16,12 @@ pqxx::result dataBase::add_resp_to_hash(const std::string& date, std::unordered_
 		}
 
 		pqxx::result response = worker.exec(
-			"SELECT * FROM rates WHERE date=$1",  
-			pqxx::params{ date });
+			"SELECT currency, rate FROM rates WHERE date = $1",  
+			pqxx::params(date));
 
 		for (const auto& row : response) {
-			std::string currency = row[2].as<std::string>();
-			double rate = row[3].as<double>();		
+			std::string currency = row[0].as<std::string>();
+			double rate = row[1].as<double>();		
 			rates[currency] = rate;
 		}
 	}

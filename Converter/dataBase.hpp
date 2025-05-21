@@ -17,7 +17,7 @@ private:
 public:
 	dataBase();
 	
-	pqxx::result add_resp_to_hash(const std::string&, std::unordered_map<std::string, double>&);
+	void add_resp_to_hash(const std::string&, std::unordered_map<std::string, double>&);
 	void add_to_db_from_hash(const std::string&, const std::unordered_map<std::string, double>&);
 	void add_to_db_row(const std::string&, const std::string&, double);
 	std::string get_current_date();
