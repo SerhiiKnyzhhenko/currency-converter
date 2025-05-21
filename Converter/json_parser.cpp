@@ -1,4 +1,4 @@
-#include "json_parser.h"
+#include "json_parser.hpp"
 
 json_parser::json_parser() : file_name(""), file() {}
 

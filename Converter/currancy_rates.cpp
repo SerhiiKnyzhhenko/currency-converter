@@ -1,4 +1,4 @@
-#include "currency_rates.h"
+#include "currency_rates.hpp"
 
 currencyRates::currencyRates() {
 	rates["USD"] = 1.0;

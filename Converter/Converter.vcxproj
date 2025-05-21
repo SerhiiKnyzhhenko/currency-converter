@@ -151,18 +151,20 @@
     <ClCompile Include="httpClient.cpp" />
     <ClCompile Include="json_parser.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="responseHandler.cpp" />
     <ClCompile Include="token.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="api_Request.hpp" />
-    <ClInclude Include="classes.h" />
-    <ClInclude Include="converter.h" />
-    <ClInclude Include="currency_rates.h" />
-    <ClInclude Include="data_base.h" />
-    <ClInclude Include="functions.h" />
+    <ClInclude Include="classes.hpp" />
+    <ClInclude Include="converter.hpp" />
+    <ClInclude Include="currency_rates.hpp" />
+    <ClInclude Include="data_base.hpp" />
+    <ClInclude Include="functions.hpp" />
     <ClInclude Include="httpClient.hpp" />
-    <ClInclude Include="json_parser.h" />
-    <ClInclude Include="token.h" />
+    <ClInclude Include="json_parser.hpp" />
+    <ClInclude Include="responeHandler.hpp" />
+    <ClInclude Include="token.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

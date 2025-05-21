@@ -39,33 +39,39 @@
     <ClCompile Include="apiRequest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="responseHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="classes.h">
+    <ClInclude Include="classes.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="functions.h">
+    <ClInclude Include="functions.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="converter.h">
+    <ClInclude Include="converter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="token.h">
+    <ClInclude Include="token.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="currency_rates.h">
+    <ClInclude Include="currency_rates.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="json_parser.h">
+    <ClInclude Include="json_parser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="httpClient.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="data_base.h">
+    <ClInclude Include="data_base.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="api_Request.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="responeHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

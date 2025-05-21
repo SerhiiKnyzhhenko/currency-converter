@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
-#include "classes.h"
-#include "https.h"
+#include "classes.hpp"
+#include "httpClient.hpp"
 #include <vector>
 #include <string>
 

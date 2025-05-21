@@ -1,4 +1,4 @@
-#include "data_base.h"
+#include "data_base.hpp"
 
 std::string conn = "host=localhost port=5432 dbname=converter user=postgres password =12345Kikki";
 
