@@ -51,13 +51,13 @@ void jsonParser::write_to_db(data_base& db) {
 
 }
 
-nlohmann::json jsonParser::parse_json() const {
+json jsonParser::parse_json() const {
 	std::ifstream file(file_name_);
 	if (!file.is_open()) throw std::runtime_error("File not open");
 	return json::parse(file);
 }
 
-bool jsonParser::check_success(const nlohmann::json& data) const {
+bool jsonParser::check_success(const json& data) const {
 	return data.value("success", false);
 }
 
