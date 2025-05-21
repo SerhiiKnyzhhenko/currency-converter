@@ -144,21 +144,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="apiRequest.cpp" />
     <ClCompile Include="converter.cpp" />
     <ClCompile Include="currancy_rates.cpp" />
     <ClCompile Include="data_base.cpp" />
-    <ClCompile Include="https.cpp" />
+    <ClCompile Include="httpClient.cpp" />
     <ClCompile Include="json_parser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="token.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="api_Request.hpp" />
     <ClInclude Include="classes.h" />
     <ClInclude Include="converter.h" />
     <ClInclude Include="currency_rates.h" />
     <ClInclude Include="data_base.h" />
     <ClInclude Include="functions.h" />
-    <ClInclude Include="https.h" />
+    <ClInclude Include="httpClient.hpp" />
     <ClInclude Include="json_parser.h" />
     <ClInclude Include="token.h" />
   </ItemGroup>

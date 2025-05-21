@@ -30,10 +30,13 @@
     <ClCompile Include="json_parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="https.cpp">
+    <ClCompile Include="httpClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="data_base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="apiRequest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,10 +59,13 @@
     <ClInclude Include="json_parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="https.h">
+    <ClInclude Include="httpClient.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="data_base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="api_Request.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
