@@ -1,5 +1,6 @@
 #ifndef HTTP_SERVER_HPP
 #define HTTP_SERVER_HPP
+#define CHK_ERR(expr, msg) 
 
 #include <vector>
 #include <fstream>
@@ -19,7 +20,8 @@ private:
 	std::string startDateTime_;
 	size_t getRequestCount_{ 0 };
 
-	SSL_METHOD* ssl_method_{ nullptr };
+	SSL* ssl { nullptr };
+	const SSL_METHOD* ssl_method_{ nullptr };
 	SSL_CTX* ssl_context_{ nullptr };
 
 	std::vector<char> fav_icon_buffer;
@@ -27,7 +29,7 @@ private:
 private:
 	bool _ssl_init();
 	bool _socket_init();
-	void _client_processing(const std::string&);
+	void _client_processing(int, const std::string&);
 
 public:
 	HttpServer(int port = 443);
