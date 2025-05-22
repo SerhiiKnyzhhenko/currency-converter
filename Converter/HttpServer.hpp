@@ -11,7 +11,7 @@ private:
 	int port_{ 443 };
 	int socket_{ -1 };
 
-	std::string sertificatePath_;
+	std::string certificatePath_;
 	std::string keyPath_;
 	std::string caPath_;
 	std::string htmlData_;
@@ -33,9 +33,11 @@ public:
 	HttpServer(int port = 443);
 	~HttpServer();
 
-	void _setSertPath(const std::string&);
+	void _setCertPath(const std::string&);
 	void _setKeyPath(const std::string&);
 	void _setPathForCA(const std::string&);
+
+	int start();
 };
 
 #endif // !HTTP_SERVER_HPP
