@@ -75,19 +75,11 @@ bool HttpServer::_ssl_init() {
 			SSL_CTX_free(ssl_context_);
 			return false;
 		}
-		SSL_CTX_set_verify(ssl_context_, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, nullptr);
+		//SSL_CTX_set_verify(ssl_context_, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, nullptr);
+		SSL_CTX_set_verify(ssl_context_, SSL_VERIFY_NONE, nullptr); //// For test
 		SSL_CTX_set_verify_depth(ssl_context_, 1);
 	}
 	
-	//A newly created SSL structure inherits information from the SSL_CTX structure.
-	//This information includes types of connection methods, options, verification settings, and timeout settings.
-	ssl = SSL_new(ssl_context_);
-	if (!ssl) {
-		ERR_print_errors_fp(stderr);
-		SSL_CTX_free(ssl_context_);
-		return false;
-	}
-
 	return true;
 }
 
@@ -121,8 +113,50 @@ bool HttpServer::_socket_init() {
 
 //------------------------------------------------------------------------------------------
 
-void HttpServer::_client_processing(int, const std::string& ) {
+void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) {
 
+	SSL* ssl = SSL_new(ssl_context_);
+	if (!ssl) {
+		ERR_print_errors_fp(stderr);
+		closesocket(sock_cli);
+		return;
+	}
+
+	SSL_set_fd(ssl, sock_cli);
+
+	int err = SSL_accept(ssl);
+	if (err <= 0) {
+		ERR_print_errors_fp(stderr);
+		SSL_free(ssl);
+		closesocket(sock_cli);
+		return;
+	}
+
+	char buf[1024];
+	err = SSL_read(ssl, buf, sizeof(buf) - 1);
+
+	if (err > 0) {
+		buf[err] = '\0';
+		printf("Received %d chars: '%s'\n", err, buf);
+
+		// Формируем HTTP-ответ
+		const char* response =
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: text/plain\r\n"
+			"Content-Length: 12\r\n"
+			"\r\n"
+			"Hello, SSL!";
+
+		// Отправка ответа
+		SSL_write(ssl, response, strlen(response));
+	}
+	else {
+		ERR_print_errors_fp(stderr);
+	}
+
+	SSL_shutdown(ssl);
+	SSL_free(ssl);
+	closesocket(sock_cli);
 }
 
 //------------------------------------------------------------------------------------------

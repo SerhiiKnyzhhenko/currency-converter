@@ -1,6 +1,8 @@
 #ifndef HTTP_SERVER_HPP
 #define HTTP_SERVER_HPP
+
 #define CHK_ERR(expr, msg) 
+#define RETURN_SSL(err) if ((err)==-1) { ERR_print_errors_fp(stderr); }
 
 #include <iostream>
 #include <vector>
@@ -28,7 +30,6 @@ private:
 	std::string startDateTime_;
 	size_t getRequestCount_{ 0 };
 
-	SSL* ssl { nullptr };
 	const SSL_METHOD* ssl_method_{ nullptr };
 	SSL_CTX* ssl_context_{ nullptr };
 

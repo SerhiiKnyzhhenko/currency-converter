@@ -72,20 +72,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Program Files %28x86%29\OpenSSL\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\OpenSSL\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\OpenSSL-x64\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\OpenSSL-x64\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Program Files %28x86%29\OpenSSL\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;C:\Program Files %28x86%29\OpenSSL\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;C:\Users\12345\source\repos\boost\boost_1_88_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\OpenSSL\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;C:\Program Files %28x86%29\OpenSSL\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\OpenSSL-x64\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;C:\Program Files %28x86%29\OpenSSL\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;C:\Users\12345\source\repos\boost\boost_1_88_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\OpenSSL-x64\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;C:\Program Files %28x86%29\OpenSSL\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;C:\Users\12345\source\repos\boost\boost_1_88_0\boost_1_88_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Program Files %28x86%29\OpenSSL\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;C:\Program Files %28x86%29\OpenSSL\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\OpenSSL\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;C:\Program Files %28x86%29\OpenSSL\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>C:\OpenSSL-x64\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;C:\Program Files %28x86%29\OpenSSL\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>C:\OpenSSL-x64\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;C:\Program Files %28x86%29\OpenSSL\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Program Files %28x86%29\OpenSSL\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\OpenSSL\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
+    <IncludePath>C:\OpenSSL-x64\include;C:\Users\12345\source\repos\nlohmann\include;C:\Program Files\libpqxx\include;C:\Users\12345\source\repos\boost;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>C:\OpenSSL-x64\lib;C:\Program Files\libpqxx\lib;C:\Program Files\PostgreSQL\17\lib;C:\Users\12345\source\repos\boost\stage\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

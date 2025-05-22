@@ -35,10 +35,17 @@ int main() {
 
 	int port = 11000;
 	
-	//HttpServer httpServ(port);
+	HttpServer httpServ(port);
 
-	fs::path pathCert = fs::current_path();
+	fs::path pathCert = fs::current_path() / "certificates" / "certificate.crt";
+	fs::path pathKey = fs::current_path() / "certificates" / "private.key";
 
+	httpServ._setCertPath(pathCert.string());
+	httpServ._setKeyPath(pathKey.string());
+
+	if (!httpServ.start()) {
+		std::cerr << "problem with starting server";
+	}
 
 	//https_get();
 
