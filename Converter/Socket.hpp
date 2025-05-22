@@ -13,7 +13,7 @@
 class Socket {
 private: 
 	SOCKET socket_ = INVALID_SOCKET;
-	
+		
 public:
 	enum class Type { TCP, UDP };
 

@@ -1,7 +1,7 @@
 #include "Socket.hpp"
 
 Socket::Socket(int domain = AF_INET, Type type = Type::TCP) {
-	socket_init();
+	Socket::socket_init();
 
 	int type_ = (type == Type::TCP) ? SOCK_STREAM : SOCK_DGRAM;
 	socket_ = ::socket(domain, type_, 0);
