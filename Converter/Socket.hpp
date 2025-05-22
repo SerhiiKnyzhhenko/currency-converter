@@ -15,9 +15,9 @@ private:
 	SOCKET socket_ = INVALID_SOCKET;
 	
 public:
-	enum class type { TCP, UDP };
+	enum class Type { TCP, UDP };
 
-	Socket(int, type);
+	Socket(int domain, Type);
 	~Socket();
 
 	Socket(const Socket&) = delete;
@@ -27,9 +27,11 @@ public:
 
 	Socket& operator=(Socket&& other) noexcept;
 
-	void socket_init();
+	static void socket_init();
 	void bind(const sockaddr* adrr, int adrrLen);
 	void listen(int backlog);
+
+	void swap(Socket& other) noexcept;
 
 	SOCKET getFd() const noexcept { return socket_; }
 };
