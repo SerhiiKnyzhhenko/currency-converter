@@ -2,6 +2,7 @@
 #define HTTP_SERVER_HPP
 #define CHK_ERR(expr, msg) 
 
+#include <iostream>
 #include <vector>
 #include <fstream>
 #include <openssl/ssl.h>
@@ -13,6 +14,7 @@ private:
 	int port_{ 443 };
 	Socket socket_;
 
+	std::string certificatePath_;
 	std::string keyPath_;
 	std::string caPath_;
 	std::string htmlData_;
@@ -28,7 +30,7 @@ private:
 
 private:
 	bool _ssl_init();
-	void _socket_init();
+	bool _socket_init();
 	void _client_processing(int, const std::string&);
 
 public:

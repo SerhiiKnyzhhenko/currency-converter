@@ -60,23 +60,17 @@ Socket& Socket::operator=(Socket&& other) noexcept {
 //------------------------------------------------------------------------------------------
 
 bool Socket::bind(const sockaddr* addr, int addrlen) {
-	if (::bind(socket_, addr, addrlen) == SOCKET_ERROR) {
-		throw std::system_error(
-			WSAGetLastError(),
-			std::system_category(),
-			"bind() failed"
-		);
-	}
+	if (::bind(socket_, addr, addrlen) == SOCKET_ERROR)
+		return false;
+
+	return true;
 }
 
 //------------------------------------------------------------------------------------------
 
-void Socket::listen(int backlog = 128) {
-	if (::listen(socket_, backlog) == SOCKET_ERROR) {
-		throw std::system_error(
-			WSAGetLastError(),
-			std::system_category(),
-			"listen() failed"
-		);
-	}
+bool Socket::listen(int backlog = 128) {
+	if (::listen(socket_, backlog) == SOCKET_ERROR)
+		return false;
+
+	return true;
 }
