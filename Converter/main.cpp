@@ -2,8 +2,10 @@
 #include <memory>
 #include "classes.hpp"
 #include "httpClient.hpp"
-#include <vector>
-#include <string>
+#include "HttpServer.hpp"
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 std::string file_name = "C:/Users/12345/OneDrive/Desktop/file.json";
 
@@ -20,17 +22,23 @@ int main() {
 
 	rp->save_to_file(body, file_name);*/
 
-	dataBase* db = new dataBase();
+	//dataBase* db = new dataBase();
 
-	/*jsonParser* jpars = new jsonParser(file_name);
-	jpars->write_to_db(*db);*/
+	// its work!!!!
+	///*jsonParser* jpars = new jsonParser(file_name);
+	//jpars->write_to_db(*db);*/
 
-	db->add_resp_to_hash("2025-01-13", rates_ptr->get_rates());
+	//db->add_resp_to_hash("2025-01-13", rates_ptr->get_rates());
 
-	for (auto a : rates_ptr.get()->get_rates())
-		std::cout << a.first << " " << a.second << std::endl;
+	//for (auto a : rates_ptr.get()->get_rates())
+	//	std::cout << a.first << " " << a.second << std::endl;
 
-    system("pause");
+	int port = 11000;
+	
+	//HttpServer httpServ(port);
+
+	fs::path pathCert = fs::current_path();
+
 
 	//https_get();
 

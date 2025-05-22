@@ -1,6 +1,5 @@
 #include "HttpServer.hpp"
 
-static int backlog = 1000;
 
 void HttpServer::_setCertPath(const std::string& certPath) {
 	certificatePath_ = certPath;
@@ -72,8 +71,6 @@ bool HttpServer::_ssl_init() {
 		SSL_CTX_set_verify_depth(ssl_context_, 1);
 	}
 	
-
-
 	//A newly created SSL structure inherits information from the SSL_CTX structure.
 	//This information includes types of connection methods, options, verification settings, and timeout settings.
 	ssl = SSL_new(ssl_context_);
@@ -84,25 +81,44 @@ bool HttpServer::_ssl_init() {
 //------------------------------------------------------------------------------------------
 
 bool HttpServer::_socket_init() {
+	try {
+		socket_ = Socket(PF_INET, Socket::Type::TCP);
 
-	socket_ = Socket(PF_INET, Socket::Type::TCP);
-	CHK_ERR(socket_, "socket"); // check error
+		sockaddr_in sa_serv{};
+		sa_serv.sin_family = AF_INET;
+		sa_serv.sin_addr.s_addr = INADDR_ANY;
+		sa_serv.sin_port = htons(port_);	  /* Server Port number */
 
-	sockaddr_in sa_serv{};
-	sa_serv.sin_family = AF_INET;
-	sa_serv.sin_addr.s_addr = INADDR_ANY;
-	sa_serv.sin_port = htons(port_);	  /* Server Port number */
+		socket_.bind((struct sockaddr*)&sa_serv, sizeof(sa_serv));
+		socket_.listen(backlog); //1000
 
-	if (socket_.bind((struct sockaddr*)&sa_serv, sizeof(sa_serv)) != 0) {
-		std::cerr << "Problem with port binding" << std::endl;
+		struct sockaddr_in sa_cli{};
+		socklen_t client_len = sizeof(sa_cli);
+
+		/* Socket for a TCP/IP connection is created */
+		SOCKET sock = accept(socket_.getFd(), (struct sockaddr*)&sa_cli, &client_len);
+
+		if (sock == INVALID_SOCKET) {
+			throw std::system_error(
+				WSAGetLastError(),
+				std::system_category(),
+				"accept() failed"
+			);
+		}
+
+		std::cout << std::format("Connection from {}, port {}", sa_cli.sin_addr.s_addr,
+			sa_cli.sin_port) << std::endl;
+
+		return true;
+	}
+	catch (const std::system_error& e) {
+		std::cerr << "Socket error: " << e.what() << std::endl;
 		return false;
 	}
-
-	if (socket_.listen(backlog) != 0) {  // default 1000
-		std::cerr << "Problem with port listening" << std::endl;
+	catch (const std::exception& e) {
+		std::cerr << "Error: " << e.what() << std::endl;
 		return false;
 	}
-	return true;
 }
 
 //------------------------------------------------------------------------------------------

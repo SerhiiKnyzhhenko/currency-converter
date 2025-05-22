@@ -28,8 +28,8 @@ public:
 	Socket& operator=(Socket&& other) noexcept;
 
 	static void socket_init();
-	bool bind(const sockaddr* adrr, int adrrLen);
-	bool listen(int backlog);
+	void bind(const sockaddr* adrr, int adrrLen);
+	void listen(int backlog);
 
 	void swap(Socket& other) noexcept;
 

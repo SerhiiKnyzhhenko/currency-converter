@@ -8,10 +8,13 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include "Socket.hpp"
+#include <format>
 
 class HttpServer {
 private: 
 	int port_{ 443 };
+	int backlog = 1000;
+
 	Socket socket_;
 
 	std::string certificatePath_;
