@@ -19,9 +19,7 @@ void HttpServer::_setPathForCA(const std::string& caPath) {
 
 //------------------------------------------------------------------------------------------
 
-HttpServer::HttpServer(int port) {
-
-}
+HttpServer::HttpServer(int port) : port_(port) {}
 
 //------------------------------------------------------------------------------------------
 
@@ -35,6 +33,7 @@ bool HttpServer::_ssl_init() {
 
 	SSL_library_init(); /* load encryption & hash algorithms for SSL */
 	SSL_load_error_strings(); /* load the error strings for good error reporting */
+	OpenSSL_add_all_algorithms();
 
 	ssl_method_ = TLS_server_method();// create new server method
 	ssl_context_ = SSL_CTX_new(ssl_method_);//create new context from method
@@ -44,36 +43,50 @@ bool HttpServer::_ssl_init() {
 	//Checking ssl_context_
 	if (ssl_context_ == NULL) {
 		ERR_print_errors_fp(stderr);
+		SSL_CTX_free(ssl_context_);
 		return false;
 	}
 
 	// set the local certificate from certFile
 	if (SSL_CTX_use_certificate_file(ssl_context_, certificatePath_.c_str(), SSL_FILETYPE_PEM) <= 0) {
 		ERR_print_errors_fp(stderr);
+		SSL_CTX_free(ssl_context_);
 		return false;
 	}
 
 	// set the local key from keyFile
 	if (SSL_CTX_use_PrivateKey_file(ssl_context_, keyPath_.c_str(), SSL_FILETYPE_PEM) <= 0) {
 		ERR_print_errors_fp(stderr);
+		SSL_CTX_free(ssl_context_);
 		return false;
 	}
 
-	if (caPath_.length() > 0) {
-		// set CA certificate from ca_certFile
-		if (SSL_CTX_load_verify_locations(ssl_context_, caPath_.c_str(), NULL) == 0) {
+	// check private key and certificate
+	if (!SSL_CTX_check_private_key(ssl_context_)) {
+		std::cerr << "Private key does not match the certificate." << std::endl;
+		SSL_CTX_free(ssl_context_);
+		return false;
+	}
+
+	// set CA certificate from ca_certFile if not empty
+	if (!caPath_.empty()) {
+		if (SSL_CTX_load_verify_locations(ssl_context_, caPath_.c_str(), nullptr) == 0) {
 			ERR_print_errors_fp(stderr);
+			SSL_CTX_free(ssl_context_);
 			return false;
 		}
-		// verification 
 		SSL_CTX_set_verify(ssl_context_, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, nullptr);
-		// Set the verification depth to 1
 		SSL_CTX_set_verify_depth(ssl_context_, 1);
 	}
 	
 	//A newly created SSL structure inherits information from the SSL_CTX structure.
 	//This information includes types of connection methods, options, verification settings, and timeout settings.
 	ssl = SSL_new(ssl_context_);
+	if (!ssl) {
+		ERR_print_errors_fp(stderr);
+		SSL_CTX_free(ssl_context_);
+		return false;
+	}
 
 	return true;
 }
@@ -82,41 +95,26 @@ bool HttpServer::_ssl_init() {
 
 bool HttpServer::_socket_init() {
 	try {
-		socket_ = Socket(PF_INET, Socket::Type::TCP);
+		socket_ = std::make_unique<Socket>(PF_INET, Socket::Type::TCP);
 
 		sockaddr_in sa_serv{};
 		sa_serv.sin_family = AF_INET;
 		sa_serv.sin_addr.s_addr = INADDR_ANY;
 		sa_serv.sin_port = htons(port_);	  /* Server Port number */
 
-		socket_.bind((struct sockaddr*)&sa_serv, sizeof(sa_serv));
-		socket_.listen(backlog); //1000
-
-		struct sockaddr_in sa_cli{};
-		socklen_t client_len = sizeof(sa_cli);
-
-		/* Socket for a TCP/IP connection is created */
-		SOCKET sock = accept(socket_.getFd(), (struct sockaddr*)&sa_cli, &client_len);
-
-		if (sock == INVALID_SOCKET) {
-			throw std::system_error(
-				WSAGetLastError(),
-				std::system_category(),
-				"accept() failed"
-			);
-		}
-
-		std::cout << std::format("Connection from {}, port {}", sa_cli.sin_addr.s_addr,
-			sa_cli.sin_port) << std::endl;
+		socket_->bind(reinterpret_cast<const struct sockaddr*>(& sa_serv), sizeof(sa_serv));
+		socket_->listen(backlog); //1000
 
 		return true;
 	}
 	catch (const std::system_error& e) {
 		std::cerr << "Socket error: " << e.what() << std::endl;
+		socket_.reset();
 		return false;
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
+		socket_.reset();
 		return false;
 	}
 }
@@ -129,6 +127,57 @@ void HttpServer::_client_processing(int, const std::string& ) {
 
 //------------------------------------------------------------------------------------------
 
-int HttpServer::start() {
+bool HttpServer::start() {
+	try {
+		if (!_ssl_init()) {
+			std::cerr << "problem with ssl init" << std::endl;
+			return false;
+		}
 
+		if (!_socket_init()) {
+			std::cerr << "problem with socket init" << std::endl;
+			return false;
+		}
+
+		is_running_ = true;
+		std::cout << "Server started on port " << port_ << std::endl;
+
+		while (is_running_) {
+			struct sockaddr_in sa_cli {};
+			socklen_t client_len = sizeof(sa_cli);
+
+			/* Socket for a TCP/IP connection is created */
+			SOCKET sock_cli = accept(socket_->getFd(), (struct sockaddr*)&sa_cli, &client_len);
+
+			if (!is_running_) break;
+
+
+			if (sock_cli == INVALID_SOCKET) {
+				throw std::system_error(
+					WSAGetLastError(),
+					std::system_category(),
+					"accept() failed"
+				);
+			}
+
+			std::thread([this, sock_cli, sa_cli]() {
+				char client_ip[INET_ADDRSTRLEN];
+				inet_ntop(AF_INET, &sa_cli.sin_addr, client_ip, INET_ADDRSTRLEN);
+
+				std::cout << "Connection from " << client_ip
+					<< ":" << ntohs(sa_cli.sin_port) << std::endl;
+
+				_client_processing(sock_cli, client_ip);
+
+				}).detach();
+		}
+	}
+	catch (const std::system_error& e) {
+		std::cerr << "System error: " << e.what() << std::endl;
+		return false;
+	}
+	catch (const std::exception& e) {
+		std::cerr << "Error: " << e.what() << std::endl;
+		return false;
+	}
 }

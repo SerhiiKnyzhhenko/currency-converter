@@ -9,13 +9,16 @@
 #include <openssl/err.h>
 #include "Socket.hpp"
 #include <format>
+#include <thread>
+#include <memory>
 
 class HttpServer {
 private: 
 	int port_{ 443 };
 	int backlog = 1000;
+	std::atomic<bool> is_running_{ false };
 
-	Socket socket_;
+	std::unique_ptr<Socket> socket_;
 
 	std::string certificatePath_;
 	std::string keyPath_;
@@ -44,7 +47,7 @@ public:
 	void _setKeyPath(const std::string&);
 	void _setPathForCA(const std::string&);
 
-	int start();
+	bool start();
 };
 
 #endif // !HTTP_SERVER_HPP

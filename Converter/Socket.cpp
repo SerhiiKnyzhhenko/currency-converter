@@ -79,4 +79,5 @@ void Socket::listen(int backlog = 128) {
 			"listen() failed"
 		);
 	}
+}
 		
