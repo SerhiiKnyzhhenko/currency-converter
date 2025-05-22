@@ -59,7 +59,7 @@ Socket& Socket::operator=(Socket&& other) noexcept {
 
 //------------------------------------------------------------------------------------------
 
-void Socket::bind(const sockaddr* addr, int addrlen) {
+bool Socket::bind(const sockaddr* addr, int addrlen) {
 	if (::bind(socket_, addr, addrlen) == SOCKET_ERROR) {
 		throw std::system_error(
 			WSAGetLastError(),

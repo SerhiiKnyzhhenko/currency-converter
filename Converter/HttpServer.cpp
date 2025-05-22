@@ -1,5 +1,6 @@
 #include "HttpServer.hpp"
 
+static int backlog = 5;
 
 void HttpServer::_setCertPath(const std::string& certPath) {
 	certificatePath_ = certPath;
@@ -82,9 +83,9 @@ bool HttpServer::_ssl_init() {
 
 //------------------------------------------------------------------------------------------
 
-bool HttpServer::_socket_init() {
+void HttpServer::_socket_init() {
 	
-	socket_ = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	socket_ = Socket(PF_INET, Socket::Type::TCP);
 	CHK_ERR(socket_, "socket"); // check error
 
 	sockaddr_in sa_serv {};
@@ -92,14 +93,8 @@ bool HttpServer::_socket_init() {
 	sa_serv.sin_addr.s_addr = INADDR_ANY;
 	sa_serv.sin_port = htons(port_);	  /* Server Port number */
 
-	int err = bind(socket_, (struct sockaddr*)&sa_serv, sizeof(sa_serv));
-	CHK_ERR(err, "bind");
-
-	/* Receive a TCP connection. */
-	err = listen(socket_, 5);
-	CHK_ERR(err, "listen");
-
-	return true;
+	socket_.bind((struct sockaddr*)&sa_serv, sizeof(sa_serv));
+	socket_.listen(backlog); // default 5
 }
 
 //------------------------------------------------------------------------------------------

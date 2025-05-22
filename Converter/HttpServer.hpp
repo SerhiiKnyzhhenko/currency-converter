@@ -6,13 +6,13 @@
 #include <fstream>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include "Socket.hpp"
 
 class HttpServer {
 private: 
 	int port_{ 443 };
-	int socket_{ -1 };
+	Socket socket_;
 
-	std::string certificatePath_;
 	std::string keyPath_;
 	std::string caPath_;
 	std::string htmlData_;
@@ -28,7 +28,7 @@ private:
 
 private:
 	bool _ssl_init();
-	bool _socket_init();
+	void _socket_init();
 	void _client_processing(int, const std::string&);
 
 public:
