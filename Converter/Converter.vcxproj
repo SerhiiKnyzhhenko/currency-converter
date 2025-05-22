@@ -153,6 +153,7 @@
     <ClCompile Include="jsonParser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="responseHandler.cpp" />
+    <ClCompile Include="Socket.cpp" />
     <ClCompile Include="token.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -166,6 +167,7 @@
     <ClInclude Include="HttpServer.hpp" />
     <ClInclude Include="jsonParser.hpp" />
     <ClInclude Include="responeHandler.hpp" />
+    <ClInclude Include="Socket.hpp" />
     <ClInclude Include="token.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
