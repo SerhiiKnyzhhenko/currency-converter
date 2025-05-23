@@ -3,6 +3,7 @@
 #include "classes.hpp"
 #include "httpClient.hpp"
 #include "HttpServer.hpp"
+#include "HttpServerBoost.hpp"
 #include <filesystem>
 
 namespace fs = std::filesystem;
@@ -33,7 +34,7 @@ int main() {
 	//for (auto a : rates_ptr.get()->get_rates())
 	//	std::cout << a.first << " " << a.second << std::endl;
 
-	int port = 11000;
+	/*int port = 11000;
 	
 	HttpServer httpServ(port);
 
@@ -45,7 +46,18 @@ int main() {
 
 	if (!httpServ.start()) {
 		std::cerr << "problem with starting server";
+	}*/
+
+	try {
+		asio::io_context io_context;
+		HttpServerBoost server(io_context, 11000);
+		server.start();
+		io_context.run();
 	}
+	catch (const std::exception& e) {
+		std::cerr << "Error: " << e.what() << std::endl;
+	}
+	return 0;
 
 	//https_get();
 
