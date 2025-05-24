@@ -1,69 +1,176 @@
-// app.js
 import { CURRENCIES, TRANSLATIONS } from './currencies-generated.js';
 
-let currentLang = 'ua';
-const API_URL = 'https://194.12.66.70:11000/api/convert';
+// Менеджер состояния приложения
+class AppState {
+    constructor() {
+        this._lang = 'ua';
+        this._subscribers = [];
+    }
 
-// Инициализация
-function init() {
-    populateCurrencies();
-    updateTranslations();
-}
+    get lang() {
+        return this._lang;
+    }
 
-// Заполнение списка валют
-function populateCurrencies() {
-    const from = document.getElementById('fromCurrency');
-    const to = document.getElementById('toCurrency');
+    set lang(newLang) {
+        const oldLang = this._lang;
+        this._lang = newLang;
+        this._subscribers.forEach(cb => cb(newLang, oldLang));
+    }
 
-    from.innerHTML = '';
-    to.innerHTML = '';
-
-    CURRENCIES.forEach(currency => {
-        const text = `${currency} - ${TRANSLATIONS[currentLang].currencies[currency]}`;
-        from.add(new Option(text, currency));
-        to.add(new Option(text, currency));
-    });
-}
-
-// Переключение языка
-function toggleLanguage() {
-    currentLang = currentLang === 'ua' ? 'en' : 'ua';
-    populateCurrencies();
-    updateTranslations();
-}
-
-// Обновление текстов
-function updateTranslations() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        el.textContent = TRANSLATIONS[currentLang][el.dataset.i18n];
-    });
-
-    document.querySelectorAll('[data-i18n-pholder]').forEach(el => {
-        el.placeholder = TRANSLATIONS[currentLang][el.dataset.i18nPholder];
-    });
-}
-
-// Конвертация
-async function convert() {
-    const amount = document.getElementById('amount').value;
-    const from = document.getElementById('fromCurrency').value;
-    const to = document.getElementById('toCurrency').value;
-
-    try {
-        const response = await fetch(`${API_URL}?from=${from}&to=${to}&amount=${amount}`);
-        const data = await response.json();
-
-        document.getElementById('result').textContent =
-            `${amount} ${from} = ${data.result} ${to}`;
-    } catch (error) {
-        document.getElementById('error').textContent =
-            TRANSLATIONS[currentLang].error + error.message;
+    subscribe(callback) {
+        this._subscribers.push(callback);
     }
 }
 
-// Экспорт функций в глобальную область видимости
-window.toggleLanguage = toggleLanguage;
-window.convert = convert;
+const appState = new AppState();
+let fromSelect, toSelect, datePicker;
 
-// Запуск при загрузке
-init();
+// Инициализация приложения
+function init() {
+    initDatePicker();
+    initSelects();
+    setupEventListeners();
+    appState.subscribe(handleLanguageChange);
+    setDefaultValues();
+    updateTranslations(appState.lang);
+}
+
+function setupEventListeners() {
+    document.querySelector('.lang-switch').addEventListener('click', () => {
+        appState.lang = appState.lang === 'ua' ? 'en' : 'ua';
+    });
+}
+
+function initDatePicker() {
+    datePicker = flatpickr("#date", {
+        locale: appState.lang === 'ua' ? 'uk' : 'en',
+        dateFormat: "Y-m-d",
+        defaultDate: new Date(),
+        maxDate: new Date(),
+        static: true // Фикс для сохранения позиции
+    });
+}
+
+function initSelects() {
+    fromSelect = new Choices('#fromCurrency', {
+        choices: generateChoiceList(appState.lang),
+        searchEnabled: true,
+        shouldSort: true,
+        duplicateItemsAllowed: false,
+        classNames: { listDropdown: 'choices__list--dropdown' }
+    });
+
+    toSelect = new Choices('#toCurrency', {
+        choices: generateChoiceList(appState.lang),
+        searchEnabled: true,
+        shouldSort: true,
+        duplicateItemsAllowed: false,
+        classNames: { listDropdown: 'choices__list--dropdown' }
+    });
+}
+
+function generateChoiceList(lang) {
+    return CURRENCIES
+        .map(currency => {
+            const translation = TRANSLATIONS[lang]?.currencies?.[currency];
+            if (!translation) {
+                console.warn(`Missing translation for ${currency} in ${lang}`);
+                return null;
+            }
+            return {
+                value: currency,
+                label: `${currency} - ${translation}`
+            };
+        })
+        .filter(Boolean);
+}
+
+function handleLanguageChange(newLang, oldLang) {
+    // Сохраняем выбранные значения и дату
+    const selectedFrom = fromSelect.getValue();
+    const selectedTo = toSelect.getValue();
+    const currentDate = datePicker.selectedDates[0];
+
+    // Обновляем DatePicker без пересоздания
+    datePicker.set('locale', newLang === 'ua' ? 'uk' : 'en');
+    datePicker.setDate(currentDate || new Date());
+
+    // Обновляем селекты с сохранением значений
+    [fromSelect, toSelect].forEach(select => select.destroy());
+
+    initSelects();
+
+    // Восстанавливаем значения после инициализации
+    setTimeout(() => {
+        fromSelect.setChoiceByValue(selectedFrom);
+        toSelect.setChoiceByValue(selectedTo);
+        if (!selectedFrom) fromSelect.setChoiceByValue('USD');
+        if (!selectedTo) toSelect.setChoiceByValue('UAH');
+    }, 100);
+
+    // Обновляем тексты
+    updateTranslations(newLang);
+}
+
+function updateTranslations(lang) {
+    // Обновляем статические тексты
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        el.textContent = TRANSLATIONS[lang][key] || el.textContent;
+    });
+
+    // Обновляем плейсхолдеры
+    document.querySelectorAll('[data-i18n-pholder]').forEach(el => {
+        const key = el.dataset.i18nPholder;
+        el.placeholder = TRANSLATIONS[lang][key] || el.placeholder;
+    });
+}
+
+function setDefaultValues() {
+    if (!fromSelect.getValue()) fromSelect.setChoiceByValue('USD');
+    if (!toSelect.getValue()) toSelect.setChoiceByValue('UAH');
+}
+
+async function convert() {
+    const amountElement = document.getElementById('amount');
+    const resultElement = document.getElementById('result');
+    const errorElement = document.getElementById('error');
+    const API_URL = 'https://194.12.66.70:11000/api/convert';
+
+    errorElement.textContent = '';
+    resultElement.textContent = '';
+
+    try {
+        const amount = parseFloat(amountElement.value);
+        if (isNaN(amount) || amount <= 0) {
+            throw new Error(TRANSLATIONS[appState.lang].invalidAmount);
+        }
+
+        const params = new URLSearchParams({
+            from: fromSelect.getValue(),
+            to: toSelect.getValue(),
+            amount: amount,
+            date: datePicker.input.value
+        });
+
+        const response = await fetch(`${API_URL}?${params}`);
+        if (!response.ok) {
+            throw new Error(`${TRANSLATIONS[appState.lang].error} ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (typeof data.result !== 'number') {
+            throw new Error(TRANSLATIONS[appState.lang].invalidResponse);
+        }
+
+        resultElement.textContent =
+            `${amount} ${fromSelect.getValue()} = ${data.result.toFixed(2)} ${toSelect.getValue()}`;
+
+    } catch (error) {
+        errorElement.textContent = error.message;
+        console.error('Conversion error:', error);
+    }
+}
+
+window.convert = convert;
+document.addEventListener('DOMContentLoaded', init);
