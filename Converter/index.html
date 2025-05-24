@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .converter {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .choices__list--dropdown {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        h1 {
+            color: #1a73e8;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        input, select, button {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+
+        .date-input {
+            -webkit-appearance: none;
+            appearance: none;
+            background: white;
+            /* Повторяем общие стили явно */
+            box-sizing: border-box;
+            width: 340px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        /* Исправления для поля даты */
+        input[type="date"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: white;
+        }
+
+        /* Стили для календаря */
+        .flatpickr-calendar {
+            width: 120% !important;
+            max-width: 400px !important;
+        }
+
+        button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #9557b0;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f0fe;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .lang-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            color: #1a73e8;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        .lang-switch:hover {
+            color: #9557b0;
+        }
+
+        .error {
+            color: #dc3545;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* Кастомизация селектов */
+        .choices__inner {
+            width: 315px !important;
+            padding: 12px !important;
+            border-radius: 8px !important;
+            min-height: auto !important;
+            border: 1px solid #ddd !important;
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+<div class="lang-switch" onclick="toggleLanguage()">UA/EN</div>
+
+<div class="converter">
+    <h1 data-i18n="title">Онлайн конвертер валют</h1>
+
+    <div class="input-group">
+        <input type="number" id="amount" step="0.01" placeholder="Сума" data-i18n-pholder="amount">
+    </div>
+
+    <div class="input-group">
+        <input type="date" id="date" class="date-input" placeholder="Дата" data-i18n-pholder="date">
+    </div>
+
+    <div class="input-group">
+        <select id="fromCurrency"></select>
+    </div>
+
+    <div class="input-group">
+        <select id="toCurrency"></select>
+    </div>
+
+    <button onclick="convert()" data-i18n="convert">Конвертувати</button>
+
+    <div id="result"></div>
+    <div id="error" class="error"></div>
+</div>
+
+<script src="https://unpkg.com/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/uk.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

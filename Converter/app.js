@@ -1,5 +1,6 @@
 import { CURRENCIES, TRANSLATIONS } from './currencies-generated.js';
 
+
 // Менеджер состояния приложения
 class AppState {
     constructor() {
@@ -52,22 +53,32 @@ function initDatePicker() {
 }
 
 function initSelects() {
-    fromSelect = new Choices('#fromCurrency', {
-        choices: generateChoiceList(appState.lang),
+    const commonConfig = {
         searchEnabled: true,
-        shouldSort: true,
+        shouldSort: false,
         duplicateItemsAllowed: false,
-        classNames: { listDropdown: 'choices__list--dropdown' }
+        classNames: {
+            containerInner: 'choices__inner',
+            listDropdown: 'choices__list--dropdown',
+            itemSelectable: 'choices__item--selectable'
+        },
+        searchPlaceholderValue: TRANSLATIONS[appState.lang].searchPlaceholder,
+        loadingText: TRANSLATIONS[appState.lang].loading
+    };
+
+    fromSelect = new Choices('#fromCurrency', {
+        ...commonConfig,
+        choices: generateChoiceList(appState.lang),
+        placeholderValue: TRANSLATIONS[appState.lang].fromPlaceholder
     });
 
     toSelect = new Choices('#toCurrency', {
+        ...commonConfig,
         choices: generateChoiceList(appState.lang),
-        searchEnabled: true,
-        shouldSort: true,
-        duplicateItemsAllowed: false,
-        classNames: { listDropdown: 'choices__list--dropdown' }
+        placeholderValue: TRANSLATIONS[appState.lang].toPlaceholder
     });
 }
+
 
 function generateChoiceList(lang) {
     return CURRENCIES
@@ -85,31 +96,27 @@ function generateChoiceList(lang) {
         .filter(Boolean);
 }
 
-function handleLanguageChange(newLang, oldLang) {
-    // Сохраняем выбранные значения и дату
-    const selectedFrom = fromSelect.getValue();
-    const selectedTo = toSelect.getValue();
+// Улучшенная обработка изменения языка
+function handleLanguageChange(newLang) {
     const currentDate = datePicker.selectedDates[0];
 
-    // Обновляем DatePicker без пересоздания
+    // Обновление календаря
     datePicker.set('locale', newLang === 'ua' ? 'uk' : 'en');
     datePicker.setDate(currentDate || new Date());
 
-    // Обновляем селекты с сохранением значений
-    [fromSelect, toSelect].forEach(select => select.destroy());
+    // Плавное обновление селектов
+    [fromSelect, toSelect].forEach(select => {
+        const tempValue = select.getValue();
+        select.destroy();
+        select.init();
+        select.setChoiceByValue(tempValue);
+    });
 
-    initSelects();
-
-    // Восстанавливаем значения после инициализации
-    setTimeout(() => {
-        fromSelect.setChoiceByValue(selectedFrom);
-        toSelect.setChoiceByValue(selectedTo);
-        if (!selectedFrom) fromSelect.setChoiceByValue('USD');
-        if (!selectedTo) toSelect.setChoiceByValue('UAH');
-    }, 100);
-
-    // Обновляем тексты
+    // Обновление текстовых элементов
     updateTranslations(newLang);
+
+    // Форсированное обновление размеров
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
 }
 
 function updateTranslations(lang) {
@@ -132,45 +139,47 @@ function setDefaultValues() {
 }
 
 async function convert() {
-    const amountElement = document.getElementById('amount');
+    const amount = Number(document.getElementById('amount').value);
     const resultElement = document.getElementById('result');
     const errorElement = document.getElementById('error');
-    const API_URL = 'https://194.12.66.70:11000/api/convert';
 
     errorElement.textContent = '';
-    resultElement.textContent = '';
+    resultElement.innerHTML = '<div class="loader"></div>';
 
     try {
-        const amount = parseFloat(amountElement.value);
-        if (isNaN(amount) || amount <= 0) {
+        // Валидация ввода
+        if (!amount || amount <= 0) {
             throw new Error(TRANSLATIONS[appState.lang].invalidAmount);
         }
 
-        const params = new URLSearchParams({
+        // Запрос к API
+        const response = await fetch(`https://api.exchangerate.host/convert?${new URLSearchParams({
             from: fromSelect.getValue(),
             to: toSelect.getValue(),
             amount: amount,
-            date: datePicker.input.value
-        });
+            date: datePicker.input.value,
+            places: 2
+        })}`);
 
-        const response = await fetch(`${API_URL}?${params}`);
-        if (!response.ok) {
-            throw new Error(`${TRANSLATIONS[appState.lang].error} ${response.status}`);
-        }
+        if (!response.ok) throw new Error(TRANSLATIONS[appState.lang].networkError);
 
         const data = await response.json();
-        if (typeof data.result !== 'number') {
-            throw new Error(TRANSLATIONS[appState.lang].invalidResponse);
-        }
+        if (data.error) throw new Error(data.error);
 
-        resultElement.textContent =
-            `${amount} ${fromSelect.getValue()} = ${data.result.toFixed(2)} ${toSelect.getValue()}`;
+        // Форматирование результата
+        resultElement.textContent = new Intl.NumberFormat(appState.lang === 'ua' ? 'uk-UA' : 'en-US', {
+            style: 'currency',
+            currency: toSelect.getValue()
+        }).format(data.result);
 
     } catch (error) {
         errorElement.textContent = error.message;
         console.error('Conversion error:', error);
+    } finally {
+        resultElement.innerHTML = '';
     }
 }
+
 
 window.convert = convert;
 document.addEventListener('DOMContentLoaded', init);
