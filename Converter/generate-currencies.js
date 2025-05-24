@@ -37,4 +37,4 @@ export const TRANSLATIONS = ${JSON.stringify({
     }
 }, null, 4)};`;
 
-fs.writeFileSync('./src/currencies-generated.js', output);
+fs.writeFileSync('./currencies-generated.js', output);
