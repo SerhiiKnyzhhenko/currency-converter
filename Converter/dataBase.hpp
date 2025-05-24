@@ -22,6 +22,7 @@ public:
 	void add_to_db_row(const std::string&, const std::string&, double);
 	std::string get_current_date();
 	std::string get_custom_date(int, int ,int);
+	bool сheckDataForDate(const std::string& date);
 
 private:
 	bool isDateValid(const std::string&);

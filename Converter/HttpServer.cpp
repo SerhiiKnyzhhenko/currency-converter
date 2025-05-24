@@ -234,19 +234,24 @@ void HttpServer::_parsingRequest(const std::string& request) {
 }
 
 void HttpServer::_processingParameters(std::unordered_map<std::string, std::string>& params) {
+	std::string from = "";
+	std::string to = "";
+	std::string amount = "";
+	std::string date = "";
 
 	if (params.find("from") != params.end())
-		std::string from = params["from"].substr(0, 3);
-
+		from = params["from"].substr(0, 3);
 	if (params.find("to") != params.end()) 
-		std::string to = params["to"].substr(0, 3);
-
+		to = params["to"].substr(0, 3);
 	if (params.find("amount") != params.end())
-		std::string amount = params["amount"];
-
+		amount = params["amount"];
 	if (params.find("date") != params.end())
-		std::string date = params["date"];
+		date = params["date"];
 
-	if
+	if (!db->сheckDataForDate(date)) {
+		httpClient requestToApi;
+		apiRequest target;
+		requestToApi.get_json_body(target.custom_date_request(date));
+	}
 
 }

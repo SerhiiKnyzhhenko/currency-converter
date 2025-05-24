@@ -8,7 +8,6 @@
 #include <boost/beast.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include "apiRequest.hpp"
 #include "responeHandler.hpp"
 
 namespace asio = boost::asio;

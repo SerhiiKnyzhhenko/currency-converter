@@ -98,3 +98,24 @@ std::string dataBase::get_custom_date(int y, int m, int d) {
 	year_month_day ymd{ year(y), month(m), day(d) };
 	return std::format("{:%Y-%m-%d}", ymd);
 }
+
+bool dataBase::сheckDataForDate(const std::string& date) {
+	try
+	{
+		if (!connectionObject.is_open()) {
+			throw std::runtime_error("Problems with connections to db");
+		}
+
+		pqxx::result response = worker.exec(
+			"SELECT currency FROM rates WHERE date = $1",
+			pqxx::params(date));
+		
+		if (response.size() > 0)
+			return true;
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+	return false;
+}

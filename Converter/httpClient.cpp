@@ -5,10 +5,7 @@
 
 httpClient::httpClient() : resolver_(ioc_), socket_(ioc_) {
     // reslove adress and establish a connection
-   asio::connect(socket_, resolver_.resolve(host_, "80"));
-
-   apiRequest request;
-   get_json_body(request.custom_date_request(request.get_current_date()));
+   asio::connect(socket_, resolver_.resolve(host_, "80")); 
 }
 
 httpClient::~httpClient() {

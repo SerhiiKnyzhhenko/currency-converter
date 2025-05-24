@@ -18,6 +18,8 @@
 #include "dataBase.hpp"
 #include "currency_rates.hpp"
 #include "converter.hpp"
+#include "httpClient.hpp"
+#include "apiRequest.hpp"
 
 
 
