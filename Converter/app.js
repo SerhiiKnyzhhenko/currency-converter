@@ -152,25 +152,36 @@ async function convert() {
             throw new Error(TRANSLATIONS[appState.lang].invalidAmount);
         }
 
-        // Запрос к API
-        const response = await fetch(`https://api.exchangerate.host/convert?${new URLSearchParams({
-            from: fromSelect.getValue(),
-            to: toSelect.getValue(),
+        // Получаем коды валют корректно
+        const fromCurrency = fromSelect.getValue(true); // true для получения сырого значения
+        const toCurrency = toSelect.getValue(true);
+
+        // Проверяем значения
+        if (typeof fromCurrency !== 'string' || typeof toCurrency !== 'string') {
+            throw new Error(TRANSLATIONS[appState.lang].invalidCurrency);
+        }
+
+        // Формируем запрос
+        const params = new URLSearchParams({
+            from: fromCurrency,
+            to: toCurrency,
             amount: amount,
             date: datePicker.input.value,
             places: 2
-        })}`);
+        });
 
-        if (!response.ok) throw new Error(TRANSLATIONS[appState.lang].networkError);
+        const response = await fetch(`https://194.12.66.70:11000/convert?${params}`);
+
+        if (!response.ok) throw new Error(`${TRANSLATIONS[appState.lang].error} ${response.status}`);
 
         const data = await response.json();
-        if (data.error) throw new Error(data.error);
+        if (typeof data.result !== 'number') {
+            throw new Error(TRANSLATIONS[appState.lang].invalidResponse);
+        }
 
-        // Форматирование результата
-        resultElement.textContent = new Intl.NumberFormat(appState.lang === 'ua' ? 'uk-UA' : 'en-US', {
-            style: 'currency',
-            currency: toSelect.getValue()
-        }).format(data.result);
+        // Форматируем результат
+        resultElement.textContent =
+            `${amount} ${fromCurrency} = ${data.result.toFixed(2)} ${toCurrency}`;
 
     } catch (error) {
         errorElement.textContent = error.message;

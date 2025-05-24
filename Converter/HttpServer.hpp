@@ -5,14 +5,18 @@
 #define RETURN_SSL(err) if ((err)==-1) { ERR_print_errors_fp(stderr); }
 
 #include <iostream>
-#include <vector>
+#include <sstream>
 #include <fstream>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include "Socket.hpp"
+#include <vector>
 #include <format>
 #include <thread>
 #include <memory>
+#include <unordered_map>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include "Socket.hpp"
+
+
 
 class HttpServer {
 private: 
@@ -22,9 +26,9 @@ private:
 
 	std::unique_ptr<Socket> socket_;
 
-	std::string certificatePath_;
-	std::string keyPath_;
-	std::string caPath_;
+	std::string certificatePath_ = "C:/Users/12345/source/repos/Converter/Converter/certificates/certificate.crt";
+	std::string keyPath_ = "C:/Users/12345/source/repos/Converter/Converter/certificates/private.key";
+	std::string caPath_ = "";
 	std::string htmlData_;
 
 	std::string startDateTime_;
@@ -47,6 +51,8 @@ public:
 	void _setCertPath(const std::string&);
 	void _setKeyPath(const std::string&);
 	void _setPathForCA(const std::string&);
+
+	void _parsingRequest(const std::string& request);
 
 	bool start();
 };

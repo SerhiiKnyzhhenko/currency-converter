@@ -34,21 +34,16 @@ int main() {
 	//for (auto a : rates_ptr.get()->get_rates())
 	//	std::cout << a.first << " " << a.second << std::endl;
 
-	/*int port = 11000;
+	int port = 11000;
 	
 	HttpServer httpServ(port);
-
-	fs::path pathCert = fs::current_path() / "certificates" / "certificate.crt";
-	fs::path pathKey = fs::current_path() / "certificates" / "private.key";
-
-	httpServ._setCertPath(pathCert.string());
-	httpServ._setKeyPath(pathKey.string());
-
 	if (!httpServ.start()) {
 		std::cerr << "problem with starting server";
-	}*/
+	}
 
-	try {
+
+	//----------------------------------------------BOOST HttpServ
+	/*try {
 		asio::io_context io_context;
 		HttpServerBoost server(io_context, 11000);
 		server.start();
@@ -57,8 +52,9 @@ int main() {
 	catch (const std::exception& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 	}
-	return 0;
-
+	return 0;*/
+	//----------------------------------------------BOOST HttpServ
+	// 
 	//https_get();
 
 	return 0;

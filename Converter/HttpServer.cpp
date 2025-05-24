@@ -4,31 +4,21 @@
 void HttpServer::_setCertPath(const std::string& certPath) {
 	certificatePath_ = certPath;
 }
-
 //------------------------------------------------------------------------------------------
-
 void HttpServer::_setKeyPath(const std::string& keyPath) {
 	keyPath_ = keyPath;
 }
-
 //------------------------------------------------------------------------------------------
-
 void HttpServer::_setPathForCA(const std::string& caPath) {
 	caPath_ = caPath;
 }
-
 //------------------------------------------------------------------------------------------
-
 HttpServer::HttpServer(int port) : port_(port) {}
-
 //------------------------------------------------------------------------------------------
-
 HttpServer::~HttpServer() {
 
 }
-
 //------------------------------------------------------------------------------------------
-
 bool HttpServer::_ssl_init() {
 
 	SSL_library_init(); /* load encryption & hash algorithms for SSL */
@@ -82,9 +72,7 @@ bool HttpServer::_ssl_init() {
 	
 	return true;
 }
-
 //------------------------------------------------------------------------------------------
-
 bool HttpServer::_socket_init() {
 	try {
 		socket_ = std::make_unique<Socket>(PF_INET, Socket::Type::TCP);
@@ -110,9 +98,7 @@ bool HttpServer::_socket_init() {
 		return false;
 	}
 }
-
 //------------------------------------------------------------------------------------------
-
 void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) {
 
 	SSL* ssl = SSL_new(ssl_context_);
@@ -137,8 +123,9 @@ void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) 
 
 	if (err > 0) {
 		buf[err] = '\0';
-		printf("Received %d chars: '%s'\n", err, buf);
-
+		_parsingRequest(buf);
+		//printf("Received %d chars: '%s'\n", err, buf);
+	
 		// Формируем HTTP-ответ
 		const char* response =
 			"HTTP/1.1 200 OK\r\n"
@@ -158,9 +145,7 @@ void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) 
 	SSL_free(ssl);
 	closesocket(sock_cli);
 }
-
 //------------------------------------------------------------------------------------------
-
 bool HttpServer::start() {
 	try {
 		if (!_ssl_init()) {
@@ -213,5 +198,51 @@ bool HttpServer::start() {
 	catch (const std::exception& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 		return false;
+	}
+}
+//------------------------------------------------------------------------------------------
+void HttpServer::_parsingRequest(const std::string& request) {
+	//GET /convert?from=AMD&to=ANG&amount=1&date=2025-05-24&places=2 HTTP/1.1
+
+	// Извлекаем первую строку до '\n'
+	size_t end_line = request.find('\n');
+	std::string first_line = request.substr(0, end_line);
+
+	// Извлекаем часть URL после '?' (параметры)
+	size_t path_start = first_line.find(' ');
+	size_t query_start = first_line.find('?', path_start);
+	std::string query = first_line.substr(query_start + 1);
+
+	// Разбиваем параметры на пары ключ=значение
+	std::unordered_map<std::string, std::string> params;
+	std::istringstream iss(query);
+	std::string pair;
+
+	while (std::getline(iss, pair, '&')) {
+		size_t delimiter = pair.find('=');
+		if (delimiter != std::string::npos) {
+			std::string key = pair.substr(0, delimiter);
+			std::string value = pair.substr(delimiter + 1);
+			params[key] = value;
+		}
+	}
+
+	// Извлекаем значения с проверкой наличия
+	if (params.find("from") != params.end()) {
+		std::string from = params["from"].substr(0, 3); // Обрезаем до 3 символов
+		std::cout << "From: " << from << std::endl;
+	}
+
+	if (params.find("to") != params.end()) {
+		std::string to = params["to"].substr(0, 3);
+		std::cout << "To: " << to << std::endl;
+	}
+
+	if (params.find("amount") != params.end()) {
+		std::cout << "Amount: " << params["amount"] << std::endl;
+	}
+
+	if (params.find("date") != params.end()) {
+		std::cout << "Date: " << params["date"] << std::endl;
 	}
 }
