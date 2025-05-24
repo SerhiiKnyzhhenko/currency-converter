@@ -13,10 +13,14 @@ void HttpServer::_setPathForCA(const std::string& caPath) {
 	caPath_ = caPath;
 }
 //------------------------------------------------------------------------------------------
-HttpServer::HttpServer(int port) : port_(port) {}
+HttpServer::HttpServer(int port) : port_(port) {
+	db = new dataBase();
+	rates = new currencyRates();
+}
 //------------------------------------------------------------------------------------------
 HttpServer::~HttpServer() {
-
+	delete db;
+	delete rates;
 }
 //------------------------------------------------------------------------------------------
 bool HttpServer::_ssl_init() {
@@ -226,23 +230,23 @@ void HttpServer::_parsingRequest(const std::string& request) {
 			params[key] = value;
 		}
 	}
+	_processingParameters(params);
+}
 
-	// Извлекаем значения с проверкой наличия
-	if (params.find("from") != params.end()) {
-		std::string from = params["from"].substr(0, 3); // Обрезаем до 3 символов
-		std::cout << "From: " << from << std::endl;
-	}
+void HttpServer::_processingParameters(std::unordered_map<std::string, std::string>& params) {
 
-	if (params.find("to") != params.end()) {
+	if (params.find("from") != params.end())
+		std::string from = params["from"].substr(0, 3);
+
+	if (params.find("to") != params.end()) 
 		std::string to = params["to"].substr(0, 3);
-		std::cout << "To: " << to << std::endl;
-	}
 
-	if (params.find("amount") != params.end()) {
-		std::cout << "Amount: " << params["amount"] << std::endl;
-	}
+	if (params.find("amount") != params.end())
+		std::string amount = params["amount"];
 
-	if (params.find("date") != params.end()) {
-		std::cout << "Date: " << params["date"] << std::endl;
-	}
+	if (params.find("date") != params.end())
+		std::string date = params["date"];
+
+	if
+
 }

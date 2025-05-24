@@ -134,6 +134,7 @@ export const CURRENCIES = [
     "TTD",
     "TWD",
     "TZS",
+    "USD",
     "UAH",
     "UGX"
 ];
@@ -282,6 +283,7 @@ export const TRANSLATIONS = {
             "TTD": "Trinidad and Tobago Dollar",
             "TWD": "New Taiwan Dollar",
             "TZS": "Tanzanian Shilling",
+            "USD": "United States Dollar",
             "UAH": "Ukrainian Hryvnia",
             "UGX": "Ugandan Sh"
         }
@@ -429,6 +431,7 @@ export const TRANSLATIONS = {
             "TTD": "Долар Трінідаду і Тобаго",
             "TWD": "Новий тайванський долар",
             "TZS": "Танзанійський шилінг",
+            "USD": "Американський долар",
             "UAH": "Українська гривня",
             "UGX": "Угандійський шилінг"
         }

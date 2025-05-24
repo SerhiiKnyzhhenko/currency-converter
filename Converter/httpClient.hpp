@@ -8,6 +8,8 @@
 #include <boost/beast.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include "apiRequest.hpp"
+#include "responeHandler.hpp"
 
 namespace asio = boost::asio;
 namespace beast = boost::beast;
@@ -17,15 +19,15 @@ using tcp = asio::ip::tcp;
 class httpClient {
 private:
 	asio::io_context ioc_;
-	std::string host_;
+	std::string host_ = "api.currencylayer.com/";
 	tcp::resolver resolver_;
 	tcp::socket socket_;
 
 public:
-	httpClient(const std::string&);
+	httpClient();
 	~httpClient();
 
-	std::string get_json_body(const std::string&);
+	void get_json_body(const std::string& target);
 };
 
 #endif // !HTTPS_H_

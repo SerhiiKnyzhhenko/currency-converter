@@ -2,6 +2,8 @@
 #define API_REQUEST_HPP
 
 #include <string>
+#include <chrono>
+#include <format>
 
 class apiRequest {
 private:
@@ -10,6 +12,8 @@ private:
 public:
 	std::string current_date_request() const;
 	std::string custom_date_request(const std::string&) const;
+
+	std::string get_current_date();
 };
 
 #endif // !API_REQUEST_HPP

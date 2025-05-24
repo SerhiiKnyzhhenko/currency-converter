@@ -15,11 +15,17 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include "Socket.hpp"
+#include "dataBase.hpp"
+#include "currency_rates.hpp"
+#include "converter.hpp"
 
 
 
 class HttpServer {
-private: 
+private:
+	dataBase* db;
+	currencyRates* rates;
+
 	int port_{ 443 };
 	int backlog = 1000;
 	std::atomic<bool> is_running_{ false };
@@ -53,6 +59,7 @@ public:
 	void _setPathForCA(const std::string&);
 
 	void _parsingRequest(const std::string& request);
+	void _processingParameters(std::unordered_map<std::string, std::string>& params);
 
 	bool start();
 };
