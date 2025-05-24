@@ -2,6 +2,8 @@
 
 using json = nlohmann::json;
 
+jsonParser::jsonParser() {}
+
 jsonParser::jsonParser(const std::string& f_name) : file_name_(f_name) {}
 
 void jsonParser::write_to_hash(std::unordered_map<std::string, double>& rates) {

@@ -12,9 +12,10 @@
 
 class jsonParser {
 private:
-	std::string file_name_;
+	std::string file_name_ = "C:/Users/12345/OneDrive/Desktop/file.json";
 
 public:
+	explicit jsonParser();
 	explicit jsonParser(const std::string&);
 
 	void write_to_hash(std::unordered_map<std::string, double>&);

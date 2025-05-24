@@ -1,6 +1,10 @@
 #include "HttpServer.hpp"
 
 
+static double convert(double from_val, double toRate, double fromRate) {
+	return from_val * (toRate / fromRate);
+}
+
 void HttpServer::_setCertPath(const std::string& certPath) {
 	certificatePath_ = certPath;
 }
@@ -252,6 +256,12 @@ void HttpServer::_processingParameters(std::unordered_map<std::string, std::stri
 		httpClient requestToApi;
 		apiRequest target;
 		requestToApi.get_json_body(target.custom_date_request(date));
-	}
+		jsonParser jPars;
+		jPars.write_to_db(*db);
+		jPars.write_to_hash(rates->get_rates());
 
+		double result = convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
+	}
+	else 
+		double result = convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
 }
