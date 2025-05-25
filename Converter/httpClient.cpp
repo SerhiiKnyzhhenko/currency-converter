@@ -1,7 +1,5 @@
 ﻿#include "httpClient.hpp"
 
-//http://api.currencylayer.com/ 
-
 
 httpClient::httpClient() : resolver_(ioc_), socket_(ioc_) {
     // reslove adress and establish a connection
