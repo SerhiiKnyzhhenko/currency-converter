@@ -3,7 +3,7 @@
 static std::string fPath = "C:/Users/12345/OneDrive/Desktop/conn.txt";
 
 // Constructor: establishes database connection
-dataBase::dataBase() {
+dataBase::dataBase() : connectionObject_{ nullptr }, worker_{ nullptr } {
 
     std::ifstream file(fPath);
     if (!file.is_open()) {
@@ -20,7 +20,10 @@ dataBase::dataBase() {
     if (!connectionObject_->is_open()) {
         throw std::runtime_error("Failed to connect to PostgreSQL");
     }
+
     worker_ = std::make_unique<pqxx::work>(*connectionObject_);
+    if (!worker_)
+        throw std::runtime_error("Database transaction is not initialized");
 }
 
 // Loads currency rates for specified date into hashmap

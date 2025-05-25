@@ -3,8 +3,7 @@
 
 void responseHandler::save_to_file(
 	const std::string& res,
-	const std::string& fPath = "C:/Users/12345/OneDrive/Desktop/file.json"
-) {
+	const std::string& fPath) {
 	std::ofstream file(fPath);
 	if (!file) throw std::runtime_error("Failed to open file: " + fPath);
 	file << res;

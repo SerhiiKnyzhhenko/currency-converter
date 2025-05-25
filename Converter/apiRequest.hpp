@@ -1,6 +1,7 @@
 #ifndef API_REQUEST_HPP
 #define API_REQUEST_HPP
 
+#include <fstream>
 #include <string>
 #include <chrono>
 #include <format>
@@ -11,6 +12,8 @@ private:
 	std::string access_key_ = "";
 
 public:
+	apiRequest();
+
 	// Generates URL for current date rates
 	std::string current_date_request() const;
 

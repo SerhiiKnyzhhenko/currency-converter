@@ -37,7 +37,3 @@ public:
 };
 
 #endif // !SOCKET_HPP
-
-
-
-

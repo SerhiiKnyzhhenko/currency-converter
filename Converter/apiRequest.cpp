@@ -1,5 +1,18 @@
 #include "apiRequest.hpp"
 
+static std::string fPath = "C:/Users/12345/OneDrive/Desktop/accesskey.txt";
+
+apiRequest::apiRequest() {
+    std::ifstream file(fPath);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open config file: " + fPath);
+    }
+
+    if (!getline(file, access_key_)) {
+        throw std::runtime_error("Failed to read connection string");
+    }
+    file.close();
+}
 
 // Builds API endpoint URL for live exchange rates
 std::string apiRequest::current_date_request() const {

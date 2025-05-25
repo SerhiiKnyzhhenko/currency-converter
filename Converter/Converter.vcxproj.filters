@@ -18,7 +18,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="currancy_rates.cpp">
+    <ClCompile Include="currancyRates.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="jsonParser.cpp">
@@ -44,7 +44,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="currency_rates.hpp">
+    <ClInclude Include="currencyRates.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="jsonParser.hpp">
