@@ -44,6 +44,7 @@ void dataBase::add_resp_to_hash(const std::string& date, std::unordered_map<std:
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
+        throw;
     }
 }
 
@@ -67,6 +68,7 @@ void dataBase::add_to_db_from_hash(const std::string& date, const std::unordered
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
+        throw;
     }
 }
 
@@ -85,11 +87,12 @@ void dataBase::add_to_db_row(const std::string& date, const std::string& currenc
             worker_->commit();
         }
         else {
-            std::cerr << "Date is no valid!" << std::endl;
+            throw std::invalid_argument("Invalid date format: " + date);
         }
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
+        throw;
     }
 }
 
@@ -125,6 +128,12 @@ std::string dataBase::get_custom_date(int y, int m, int d) const {
 // Checks if data exists for specified date
 bool dataBase::checkDataForDate(const std::string& date) const {
     try {
+
+        if (!isDateValid(date)) {
+            throw std::invalid_argument("Invalid date format: " + date);
+        }
+
+
         if (!connectionObject_->is_open()) {
             throw std::runtime_error("Problems with connections to db");
         }
@@ -136,7 +145,8 @@ bool dataBase::checkDataForDate(const std::string& date) const {
         return !response.empty();
     }
     catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "[ERROR] checkDataForDate: " << e.what() << std::endl;
+        throw;
     }
     return false;
 }

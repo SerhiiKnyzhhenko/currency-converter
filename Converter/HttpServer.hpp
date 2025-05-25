@@ -25,8 +25,8 @@
 
 class HttpServer {
 private:
-	dataBase* db;
-	currencyRates* rates;
+	std::unique_ptr<dataBase> db;
+	std::unique_ptr<currencyRates> rates;
 
 	int port_{ 443 };
 	int backlog = 1000;
@@ -54,7 +54,6 @@ private:
 
 public:
 	HttpServer(int port = 443);
-	~HttpServer();
 
 	void _setCertPath(const std::string&);
 	void _setKeyPath(const std::string&);

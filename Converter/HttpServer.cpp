@@ -18,13 +18,14 @@ void HttpServer::_setPathForCA(const std::string& caPath) {
 }
 //------------------------------------------------------------------------------------------
 HttpServer::HttpServer(int port) : port_(port) {
-	db = new dataBase();
-	rates = new currencyRates();
-}
-//------------------------------------------------------------------------------------------
-HttpServer::~HttpServer() {
-	delete db;
-	delete rates;
+	try {
+		db = std::make_unique<dataBase>();
+		rates = std::make_unique<currencyRates>();
+	}
+	catch (const std::exception& e) {
+		std::cerr << "[ERROR] Initialization failed: " << e.what() << std::endl;
+		throw;
+	}
 }
 //------------------------------------------------------------------------------------------
 bool HttpServer::_ssl_init() {
