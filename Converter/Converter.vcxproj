@@ -155,7 +155,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="apiRequest.cpp" />
-    <ClCompile Include="converter.cpp" />
     <ClCompile Include="currancy_rates.cpp" />
     <ClCompile Include="dataBase.cpp" />
     <ClCompile Include="httpClient.cpp" />
@@ -165,22 +164,17 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="responseHandler.cpp" />
     <ClCompile Include="Socket.cpp" />
-    <ClCompile Include="token.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="apiRequest.hpp" />
-    <ClInclude Include="classes.hpp" />
-    <ClInclude Include="converter.hpp" />
     <ClInclude Include="currency_rates.hpp" />
     <ClInclude Include="dataBase.hpp" />
-    <ClInclude Include="functions.hpp" />
     <ClInclude Include="httpClient.hpp" />
     <ClInclude Include="HttpServer.hpp" />
     <ClInclude Include="HttpServerBoost.hpp" />
     <ClInclude Include="jsonParser.hpp" />
     <ClInclude Include="responeHandler.hpp" />
     <ClInclude Include="Socket.hpp" />
-    <ClInclude Include="token.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
