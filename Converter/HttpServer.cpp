@@ -262,7 +262,7 @@ double HttpServer::_processingParameters(std::unordered_map<std::string, std::st
 	if (params.find("date") != params.end())
 		date = params["date"];
 
-	if (!db->сheckDataForDate(date)) {
+	if (!db->checkDataForDate(date)) {
 		httpClient requestToApi;
 		apiRequest target;
 		requestToApi.get_json_body(target.custom_date_request(date));

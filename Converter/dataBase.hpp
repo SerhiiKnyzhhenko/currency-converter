@@ -3,16 +3,18 @@
 
 #include <pqxx/pqxx>
 #include <iostream>
+#include <fstream>
 #include <chrono>
 #include <format>
 #include <regex>
+#include <memory>
 
 extern std::string conn;
 
 class dataBase {
 private:
-	pqxx::connection connectionObject;
-	pqxx::work worker;
+	std::unique_ptr<pqxx::connection> connectionObject_;
+	std::unique_ptr<pqxx::work> worker_;
 
 public:
 	dataBase();
@@ -22,7 +24,7 @@ public:
 	void add_to_db_row(const std::string&, const std::string&, double);
 	std::string get_current_date();
 	std::string get_custom_date(int, int ,int);
-	bool сheckDataForDate(const std::string& date);
+	bool checkDataForDate(const std::string& date);
 
 private:
 	bool isDateValid(const std::string&);
