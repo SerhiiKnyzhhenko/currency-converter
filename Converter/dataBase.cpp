@@ -1,6 +1,6 @@
 #include "dataBase.hpp"
 
-static std::string fPath = "C:/Users/12345/OneDrive/Desktop/pass.txt";
+static std::string fPath = "C:/Users/12345/OneDrive/Desktop/conn.txt";
 
 // Constructor: establishes database connection
 dataBase::dataBase() {
@@ -94,7 +94,7 @@ void dataBase::add_to_db_row(const std::string& date, const std::string& currenc
 }
 
 // Returns current date in YYYY-MM-DD format
-std::string dataBase::get_current_date() {
+std::string dataBase::get_current_date() const {
     auto now = std::chrono::system_clock::now();
     auto today = std::chrono::current_zone()->to_local(now);
     auto ymd = std::chrono::year_month_day(std::chrono::floor<std::chrono::days>(today));
@@ -103,20 +103,27 @@ std::string dataBase::get_current_date() {
 }
 
 // Validates date format (YYYY-MM-DD)
-bool dataBase::isDateValid(const std::string& date) {
-    std::regex pattern(R"(\d{4}-\d{2}-\d{2})");
-    return std::regex_match(date, pattern);
+bool dataBase::isDateValid(const std::string& date) const {
+    try {
+        std::chrono::year_month_day ymd{};
+        std::istringstream iss(date);
+        iss >> std::chrono::parse("%F", ymd);
+        return ymd.ok();
+    }
+    catch (...) {
+        return false;
+    }
 }
 
 // Generates custom date string from components
-std::string dataBase::get_custom_date(int y, int m, int d) {
+std::string dataBase::get_custom_date(int y, int m, int d) const {
     using namespace std::chrono;
     year_month_day ymd{ year(y), month(m), day(d) };
     return std::format("{:%Y-%m-%d}", ymd);
 }
 
 // Checks if data exists for specified date
-bool dataBase::checkDataForDate(const std::string& date) {
+bool dataBase::checkDataForDate(const std::string& date) const {
     try {
         if (!connectionObject_->is_open()) {
             throw std::runtime_error("Problems with connections to db");

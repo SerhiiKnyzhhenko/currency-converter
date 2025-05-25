@@ -22,12 +22,12 @@ public:
 	void add_resp_to_hash(const std::string&, std::unordered_map<std::string, double>&);
 	void add_to_db_from_hash(const std::string&, const std::unordered_map<std::string, double>&);
 	void add_to_db_row(const std::string&, const std::string&, double);
-	std::string get_current_date();
-	std::string get_custom_date(int, int ,int);
-	bool checkDataForDate(const std::string& date);
+	std::string get_current_date() const;
+	std::string get_custom_date(int, int ,int) const;
+	bool checkDataForDate(const std::string& date) const;
 
 private:
-	bool isDateValid(const std::string&);
+	bool isDateValid(const std::string&) const;
 };
 
 #endif // !DATA_BASE_H
