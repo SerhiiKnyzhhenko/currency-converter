@@ -60,8 +60,8 @@ public:
 	void _setKeyPath(const std::string&);
 	void _setPathForCA(const std::string&);
 
-	void _parsingRequest(const std::string& request);
-	void _processingParameters(std::unordered_map<std::string, std::string>& params);
+	double _parsingRequest(const std::string& request);
+	double _processingParameters(std::unordered_map<std::string, std::string>& params);
 
 	bool start();
 };

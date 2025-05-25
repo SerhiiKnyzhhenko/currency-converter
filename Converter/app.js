@@ -143,51 +143,79 @@ async function convert() {
     const resultElement = document.getElementById('result');
     const errorElement = document.getElementById('error');
 
+    // Сброс предыдущих сообщений
     errorElement.textContent = '';
-    resultElement.innerHTML = '<div class="loader"></div>';
+    resultElement.innerHTML = '<div class="loader"></div>'; // Показ лоадера
 
     try {
         // Валидация ввода
-        if (!amount || amount <= 0) {
-            throw new Error(TRANSLATIONS[appState.lang].invalidAmount);
-        }
+        // if (isNaN(amount) throw new Error(TRANSLATIONS[appState.lang].invalidAmount);
+        if (amount <= 0) throw new Error(TRANSLATIONS[appState.lang].invalidAmount);
 
-        // Получаем коды валют корректно
-        const fromCurrency = fromSelect.getValue(true); // true для получения сырого значения
+        // Получение кодов валют
+        const fromCurrency = fromSelect.getValue(true);
         const toCurrency = toSelect.getValue(true);
 
-        // Проверяем значения
-        if (typeof fromCurrency !== 'string' || typeof toCurrency !== 'string') {
+        // Проверка валют
+        if (!fromCurrency || !toCurrency) {
             throw new Error(TRANSLATIONS[appState.lang].invalidCurrency);
         }
 
-        // Формируем запрос
+        // Формирование параметров запроса
         const params = new URLSearchParams({
             from: fromCurrency,
             to: toCurrency,
-            amount: amount,
+            amount: amount.toFixed(2),
             date: datePicker.input.value,
             places: 2
         });
 
-        const response = await fetch(`https://194.12.66.70:11000/convert?${params}`);
+        // Выполнение запроса с таймаутом
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // Таймаут 10 сек
 
-        if (!response.ok) throw new Error(`${TRANSLATIONS[appState.lang].error} ${response.status}`);
+        const response = await fetch(`https://194.12.66.70:11000/convert?${params}`, {
+            signal: controller.signal
+        });
 
+        clearTimeout(timeoutId); // Отмена таймаута при успешном ответе
+
+        // Обработка HTTP-ошибок
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`${TRANSLATIONS[appState.lang].error} ${response.status}: ${errorText}`);
+        }
+
+        // Парсинг JSON
         const data = await response.json();
+
+        // Проверка структуры ответа
         if (typeof data.result !== 'number') {
             throw new Error(TRANSLATIONS[appState.lang].invalidResponse);
         }
 
-        // Форматируем результат
-        resultElement.textContent =
-            `${amount} ${fromCurrency} = ${data.result.toFixed(2)} ${toCurrency}`;
+        // Форматирование результата
+        resultElement.innerHTML = `
+            <div class="result-block">
+                <span class="amount">${amount.toFixed(2)} ${fromCurrency}</span>
+                <span class="equals">=</span>
+                <span class="converted">${data.result.toFixed(2)} ${toCurrency}</span>
+            </div>
+        `;
 
     } catch (error) {
-        errorElement.textContent = error.message;
-        console.error('Conversion error:', error);
+        // Обработка ошибок
+        errorElement.textContent = error.message.includes("aborted")
+            ? TRANSLATIONS[appState.lang].timeoutError
+            : error.message;
+
+        resultElement.innerHTML = ''; // Очистка результата при ошибке
+        console.error("Ошибка конвертации:", error);
+
     } finally {
-        resultElement.innerHTML = '';
+        // Убедиться, что лоадер скрыт даже при успешном выполнении
+        const loader = resultElement.querySelector('.loader');
+        if (loader) loader.remove();
     }
 }
 

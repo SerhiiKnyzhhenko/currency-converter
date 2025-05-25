@@ -18,7 +18,7 @@ using tcp = asio::ip::tcp;
 class httpClient {
 private:
 	asio::io_context ioc_;
-	std::string host_ = "api.currencylayer.com/";
+	std::string host_ = "api.currencylayer.com";
 	tcp::resolver resolver_;
 	tcp::socket socket_;
 

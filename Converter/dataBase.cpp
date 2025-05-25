@@ -110,7 +110,7 @@ bool dataBase::сheckDataForDate(const std::string& date) {
 			"SELECT currency FROM rates WHERE date = $1",
 			pqxx::params(date));
 		
-		if (response.size() > 0)
+		if (!response.empty())
 			return true;
 	}
 	catch (const std::exception& e)

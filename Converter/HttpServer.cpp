@@ -131,19 +131,27 @@ void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) 
 
 	if (err > 0) {
 		buf[err] = '\0';
-		_parsingRequest(buf);
-		//printf("Received %d chars: '%s'\n", err, buf);
-	
-		// Формируем HTTP-ответ
-		const char* response =
-			"HTTP/1.1 200 OK\r\n"
-			"Content-Type: text/plain\r\n"
-			"Content-Length: 12\r\n"
-			"\r\n"
-			"Hello, SSL!";
+		double result = _parsingRequest(buf);
 
-		// Отправка ответа
-		SSL_write(ssl, response, strlen(response));
+		// Формируем JSON-ответ
+		std::string json_response = "{\"result\": " + std::to_string(result) + "}";
+
+		// Устанавливаем заголовки
+		std::string headers =
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: application/json\r\n"
+			"Access-Control-Allow-Origin: *\r\n" 
+			"Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
+			"Access-Control-Allow-Headers: Content-Type\r\n"
+			"Content-Length: " + std::to_string(json_response.size()) + "\r\n"
+			"\r\n";
+
+		// Отправка заголовков и JSON-ответа
+		SSL_write(ssl, headers.c_str(), headers.size());
+		SSL_write(ssl, json_response.c_str(), json_response.size());
+
+		std::cout << "Response sent to client:\n"
+			<< headers << json_response << std::endl;
 	}
 	else {
 		ERR_print_errors_fp(stderr);
@@ -209,13 +217,13 @@ bool HttpServer::start() {
 	}
 }
 //------------------------------------------------------------------------------------------
-void HttpServer::_parsingRequest(const std::string& request) {
+double HttpServer::_parsingRequest(const std::string& request) {
 	//GET /convert?from=AMD&to=ANG&amount=1&date=2025-05-24&places=2 HTTP/1.1
 
 	// Извлекаем первую строку до '\n'
 	size_t end_line = request.find('\n');
 	std::string first_line = request.substr(0, end_line);
-
+	std::cout << first_line << std::endl;
 	// Извлекаем часть URL после '?' (параметры)
 	size_t path_start = first_line.find(' ');
 	size_t query_start = first_line.find('?', path_start);
@@ -234,10 +242,12 @@ void HttpServer::_parsingRequest(const std::string& request) {
 			params[key] = value;
 		}
 	}
-	_processingParameters(params);
+	return _processingParameters(params);
 }
 
-void HttpServer::_processingParameters(std::unordered_map<std::string, std::string>& params) {
+double HttpServer::_processingParameters(std::unordered_map<std::string, std::string>& params) {
+	double result = 0;
+
 	std::string from = "";
 	std::string to = "";
 	std::string amount = "";
@@ -260,8 +270,12 @@ void HttpServer::_processingParameters(std::unordered_map<std::string, std::stri
 		jPars.write_to_db(*db);
 		jPars.write_to_hash(rates->get_rates());
 
-		double result = convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
+		result = convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
 	}
-	else 
-		double result = convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
+	else {
+		db->add_resp_to_hash(date, rates->get_rates());
+		result = convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
+	}
+		
+	return result;
 }
