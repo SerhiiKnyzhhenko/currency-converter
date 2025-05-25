@@ -264,14 +264,19 @@ double HttpServer::_processingParameters(std::unordered_map<std::string, std::st
 		date = params["date"];
 
 	if (!db->checkDataForDate(date)) {
-		httpClient requestToApi;
-		apiRequest target;
-		requestToApi.get_json_body(target.custom_date_request(date));
-		jsonParser jPars;
-		jPars.write_to_db(*db);
-		jPars.write_to_hash(rates->get_rates());
+		try {
+			httpClient requestToApi;
+			apiRequest target;
+			requestToApi.get_json_body(target.custom_date_request(date));
+			jsonParser jPars;
+			jPars.write_to_db(*db);
+			jPars.write_to_hash(rates->get_rates());
 
-		result = convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
+			result = convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Error: " << e.what() << std::endl;
+		}	
 	}
 	else {
 		db->add_resp_to_hash(date, rates->get_rates());

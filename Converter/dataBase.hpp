@@ -25,8 +25,6 @@ public:
 	std::string get_current_date() const;
 	std::string get_custom_date(int, int ,int) const;
 	bool checkDataForDate(const std::string& date) const;
-
-private:
 	bool isDateValid(const std::string&) const;
 };
 

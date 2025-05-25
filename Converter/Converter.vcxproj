@@ -159,7 +159,6 @@
     <ClCompile Include="dataBase.cpp" />
     <ClCompile Include="httpClient.cpp" />
     <ClCompile Include="HttpServer.cpp" />
-    <ClCompile Include="HttpServerBoost.cpp" />
     <ClCompile Include="jsonParser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="responseHandler.cpp" />
