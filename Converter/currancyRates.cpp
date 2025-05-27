@@ -30,3 +30,7 @@ void currencyRates::add_rate(const std::string& currency, double rate) {
 		throw std::invalid_argument("Rate must be positive");
 	rates_[currency] = rate;
 }
+
+ double currencyRates::convert(double from_val, double toRate, double fromRate) {
+	return from_val * (toRate / fromRate);
+}

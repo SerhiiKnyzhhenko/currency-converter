@@ -18,6 +18,7 @@ public:
 	std::unordered_map<std::string, double>& get_rates(); // Returns reference to all rates	
 	double get_rate(const std::string& currency) const; // Returns rate or -1.0 if not found
 	void add_rate(const std::string& currency, double rate); // Adds/updates a rate
+	double convert(double from_val, double toRate, double fromRate);
 
 };
 

@@ -1,10 +1,6 @@
 #include "HttpServer.hpp"
 
 
-static double convert(double from_val, double toRate, double fromRate) {
-	return from_val * (toRate / fromRate);
-}
-
 void HttpServer::_setCertPath(const std::string& certPath) {
 	certificatePath_ = certPath;
 }
@@ -28,61 +24,62 @@ HttpServer::HttpServer(int port) : port_(port) {
 	}
 }
 //------------------------------------------------------------------------------------------
-bool HttpServer::_ssl_init() {
+HttpServer::~HttpServer() {
+	std::cout << "The server stopped working\n";
+	std::cout << "Number of connections to the server" + getRequestCount_ << std::endl;
+}
+//------------------------------------------------------------------------------------------
+void HttpServer::_ssl_init() {
 
-	SSL_library_init(); /* load encryption & hash algorithms for SSL */
-	SSL_load_error_strings(); /* load the error strings for good error reporting */
-	OpenSSL_add_all_algorithms();
+	if (OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | 
+						 OPENSSL_INIT_LOAD_CRYPTO_STRINGS, 
+						 NULL) != 1) {
+		throw std::runtime_error("OPENSSL_init_ssl() failed" + std::to_string(ERR_get_error()));
+	}
+		
+	if (OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS | 
+							OPENSSL_INIT_ADD_ALL_CIPHERS | 
+							OPENSSL_INIT_ADD_ALL_DIGESTS, 
+							NULL) != 1) {
+		throw std::runtime_error("OPENSSL_init_crypto() failed" + std::to_string(ERR_get_error()));
+	}
+
 
 	ssl_method_ = TLS_server_method();// create new server method
-	ssl_context_ = SSL_CTX_new(ssl_method_);//create new context from method
-
-	SSL_CTX_set_min_proto_version(ssl_context_, TLS1_3_VERSION);// Disable obsolete protocols
+	ssl_context_ = SSL_CTX_ptr(SSL_CTX_new(ssl_method_));//create new context from method
 
 	//Checking ssl_context_
-	if (ssl_context_ == NULL) {
-		ERR_print_errors_fp(stderr);
-		SSL_CTX_free(ssl_context_);
-		return false;
-	}
+	if (!ssl_context_)
+		throw std::runtime_error("SSL_CTX_new() failed" + std::to_string(ERR_get_error()));
+
+	SSL_CTX_set_cipher_list(ssl_context_.get(), "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256");
+	SSL_CTX_set_min_proto_version(ssl_context_.get(), TLS1_3_VERSION);// Disable obsolete protocols
+
 
 	// set the local certificate from certFile
-	if (SSL_CTX_use_certificate_file(ssl_context_, certificatePath_.c_str(), SSL_FILETYPE_PEM) <= 0) {
-		ERR_print_errors_fp(stderr);
-		SSL_CTX_free(ssl_context_);
-		return false;
-	}
+	if (SSL_CTX_use_certificate_file(ssl_context_.get(), certificatePath_.c_str(), SSL_FILETYPE_PEM) <= 0) 
+		throw std::runtime_error("Failed to load certificate key" + std::to_string(ERR_get_error()));
 
 	// set the local key from keyFile
-	if (SSL_CTX_use_PrivateKey_file(ssl_context_, keyPath_.c_str(), SSL_FILETYPE_PEM) <= 0) {
-		ERR_print_errors_fp(stderr);
-		SSL_CTX_free(ssl_context_);
-		return false;
-	}
+	if (SSL_CTX_use_PrivateKey_file(ssl_context_.get(), keyPath_.c_str(), SSL_FILETYPE_PEM) <= 0) 
+		throw std::runtime_error("Failed to load private key" + std::to_string(ERR_get_error()));
 
 	// check private key and certificate
-	if (!SSL_CTX_check_private_key(ssl_context_)) {
-		std::cerr << "Private key does not match the certificate." << std::endl;
-		SSL_CTX_free(ssl_context_);
-		return false;
-	}
+	if (!SSL_CTX_check_private_key(ssl_context_.get())) 
+		throw std::runtime_error("SSL_CTX_check_private_key() failed" + std::to_string(ERR_get_error()));
 
 	// set CA certificate from ca_certFile if not empty
 	if (!caPath_.empty()) {
-		if (SSL_CTX_load_verify_locations(ssl_context_, caPath_.c_str(), nullptr) == 0) {
-			ERR_print_errors_fp(stderr);
-			SSL_CTX_free(ssl_context_);
-			return false;
+		if (SSL_CTX_load_verify_locations(ssl_context_.get(), caPath_.c_str(), nullptr) == 0) {
+			throw std::runtime_error("Failed to load CA certificates" + std::to_string(ERR_get_error()));
 		}
 		//SSL_CTX_set_verify(ssl_context_, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, nullptr);
-		SSL_CTX_set_verify(ssl_context_, SSL_VERIFY_NONE, nullptr); //// For test
-		SSL_CTX_set_verify_depth(ssl_context_, 1);
+		SSL_CTX_set_verify(ssl_context_.get(), SSL_VERIFY_NONE, nullptr); //// For test
+		SSL_CTX_set_verify_depth(ssl_context_.get(), 1);
 	}
-	
-	return true;
 }
 //------------------------------------------------------------------------------------------
-bool HttpServer::_socket_init() {
+void HttpServer::_socket_init() {
 	try {
 		socket_ = std::make_unique<Socket>(PF_INET, Socket::Type::TCP);
 
@@ -93,42 +90,39 @@ bool HttpServer::_socket_init() {
 
 		socket_->bind(reinterpret_cast<const struct sockaddr*>(& sa_serv), sizeof(sa_serv));
 		socket_->listen(backlog); //1000
-
-		return true;
 	}
 	catch (const std::system_error& e) {
 		std::cerr << "Socket error: " << e.what() << std::endl;
 		socket_.reset();
-		return false;
+		throw;
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 		socket_.reset();
-		return false;
+		throw;
 	}
 }
 //------------------------------------------------------------------------------------------
 void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) {
 
-	SSL* ssl = SSL_new(ssl_context_);
+	SSL_ptr ssl(SSL_new(ssl_context_.get()));
 	if (!ssl) {
 		ERR_print_errors_fp(stderr);
 		closesocket(sock_cli);
 		return;
 	}
 
-	SSL_set_fd(ssl, sock_cli);
+	SSL_set_fd(ssl.get(), sock_cli);
 
-	int err = SSL_accept(ssl);
+	int err = SSL_accept(ssl.get());
 	if (err <= 0) {
 		ERR_print_errors_fp(stderr);
-		SSL_free(ssl);
 		closesocket(sock_cli);
 		return;
 	}
 
 	char buf[1024];
-	err = SSL_read(ssl, buf, sizeof(buf) - 1);
+	err = SSL_read(ssl.get(), buf, sizeof(buf) - 1);
 
 	if (err > 0) {
 		buf[err] = '\0';
@@ -148,8 +142,8 @@ void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) 
 			"\r\n";
 
 		// Отправка заголовков и JSON-ответа
-		SSL_write(ssl, headers.c_str(), headers.size());
-		SSL_write(ssl, json_response.c_str(), json_response.size());
+		SSL_write(ssl.get(), headers.c_str(), headers.size());
+		SSL_write(ssl.get(), json_response.c_str(), json_response.size());
 
 		std::cout << "Response sent to client:\n"
 			<< headers << json_response << std::endl;
@@ -158,21 +152,29 @@ void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) 
 		ERR_print_errors_fp(stderr);
 	}
 
-	SSL_shutdown(ssl);
-	SSL_free(ssl);
+	SSL_shutdown(ssl.get());
 	closesocket(sock_cli);
 }
 //------------------------------------------------------------------------------------------
 bool HttpServer::start() {
 	try {
-		if (!_ssl_init()) {
-			std::cerr << "problem with ssl init" << std::endl;
-			return false;
+		_setCertPath("C:/Users/12345/source/repos/Converter/Converter/certificates/certificate.crt");
+		_setKeyPath("C:/Users/12345/source/repos/Converter/Converter/certificates/private.key");
+
+		try {
+			_ssl_init();
+		}
+		catch (const std::exception& e) {
+			std::cerr << "[ERROR] SSL init Error: " << e.what() << std::endl;
+			throw;
 		}
 
-		if (!_socket_init()) {
-			std::cerr << "problem with socket init" << std::endl;
-			return false;
+		try {
+			_socket_init();
+		}
+		catch (const std::exception& e) {
+			std::cerr << "[ERROR] Socket init Error: " << e.what() << std::endl;
+			throw;
 		}
 
 		is_running_ = true;
@@ -204,7 +206,7 @@ bool HttpServer::start() {
 					<< ":" << ntohs(sa_cli.sin_port) << std::endl;
 
 				_client_processing(sock_cli, client_ip);
-
+				getRequestCount_ += 1;
 				}).detach();
 		}
 	}
@@ -272,7 +274,7 @@ double HttpServer::_processingParameters(std::unordered_map<std::string, std::st
 			jPars.write_to_db(*db);
 			jPars.write_to_hash(rates->get_rates());
 
-			result = convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
+			result = rates->convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
 		}
 		catch (const std::exception& e) {
 			std::cerr << "Error: " << e.what() << std::endl;
@@ -280,7 +282,7 @@ double HttpServer::_processingParameters(std::unordered_map<std::string, std::st
 	}
 	else {
 		db->add_resp_to_hash(date, rates->get_rates());
-		result = convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
+		result = rates->convert(std::stod(amount), rates->get_rate(to), rates->get_rate(from));
 	}
 		
 	return result;

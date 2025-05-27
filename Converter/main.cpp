@@ -3,31 +3,21 @@
 
 
 int main() {
-
 	try {
-		HttpServer server(11000); // Создание сервера
+		HttpServer server(11000);
 		server.start();
+	}
+	catch (const std::system_error& e) {
+		std::cerr << "System error: " << e.what() << std::endl;
+		return 1;
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Fatal error: " << e.what() << std::endl;
 		return 1;
 	}
-
-
-	//----------------------------------------------BOOST HttpServ
-	/*try {
-		asio::io_context io_context;
-		HttpServerBoost server(io_context, 11000);
-		server.start();
-		io_context.run();
+	catch (...) {
+		std::cerr << "Unknown error" << std::endl;
+		return 1;
 	}
-	catch (const std::exception& e) {
-		std::cerr << "Error: " << e.what() << std::endl;
-	}
-	return 0;*/
-	//----------------------------------------------BOOST HttpServ
-	// 
-	//https_get();
-
 	return 0;
 }

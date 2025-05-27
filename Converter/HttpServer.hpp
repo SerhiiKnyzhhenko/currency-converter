@@ -22,6 +22,20 @@
 #include "jsonParser.hpp"
 
 
+struct SSL_CTX_Deleter {
+	void operator()(SSL_CTX* ssl_ctx) const {
+		SSL_CTX_free(ssl_ctx);
+	}
+};
+
+struct SSL_Deleter {
+	void operator()(SSL* ssl) const {
+		SSL_free(ssl);
+	}
+};
+
+using SSL_CTX_ptr = std::unique_ptr<SSL_CTX, SSL_CTX_Deleter>;
+using SSL_ptr = std::unique_ptr<SSL, SSL_Deleter>;
 
 class HttpServer {
 private:
@@ -34,8 +48,8 @@ private:
 
 	std::unique_ptr<Socket> socket_;
 
-	std::string certificatePath_ = "C:/Users/12345/source/repos/Converter/Converter/certificates/certificate.crt";
-	std::string keyPath_ = "C:/Users/12345/source/repos/Converter/Converter/certificates/private.key";
+	std::string certificatePath_ = "";
+	std::string keyPath_ = "";
 	std::string caPath_ = "";
 	std::string htmlData_;
 
@@ -43,17 +57,18 @@ private:
 	size_t getRequestCount_{ 0 };
 
 	const SSL_METHOD* ssl_method_{ nullptr };
-	SSL_CTX* ssl_context_{ nullptr };
+	SSL_CTX_ptr ssl_context_;
 
 	std::vector<char> fav_icon_buffer;
 
 private:
-	bool _ssl_init();
-	bool _socket_init();
+	void _ssl_init();
+	void _socket_init();
 	void _client_processing(int, const std::string&);
 
 public:
 	HttpServer(int port = 443);
+	~HttpServer();
 
 	void _setCertPath(const std::string&);
 	void _setKeyPath(const std::string&);
