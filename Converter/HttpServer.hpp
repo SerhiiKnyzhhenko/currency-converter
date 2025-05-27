@@ -16,7 +16,7 @@
 #include <openssl/err.h>
 #include "Socket.hpp"
 #include "dataBase.hpp"
-#include "currency_rates.hpp"
+#include "currencyRates.hpp"
 #include "httpClient.hpp"
 #include "apiRequest.hpp"
 #include "jsonParser.hpp"
