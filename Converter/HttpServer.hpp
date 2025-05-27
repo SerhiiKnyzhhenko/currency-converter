@@ -3,6 +3,7 @@
 
 #define CHK_ERR(expr, msg) 
 #define RETURN_SSL(err) if ((err)==-1) { ERR_print_errors_fp(stderr); }
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <iostream>
 #include <sstream>
@@ -65,8 +66,6 @@ private:
 	void _ssl_init();
 	void _socket_init();
 	void _client_processing(int, const std::string&);
-
-	void readErrorCode(int err);
 
 	void _setCertPath(const std::string&);
 	void _setKeyPath(const std::string&);

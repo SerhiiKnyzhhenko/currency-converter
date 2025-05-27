@@ -31,17 +31,18 @@ HttpServer::~HttpServer() {
 //------------------------------------------------------------------------------------------
 void HttpServer::_ssl_init() {
 
-	if (OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | 
+	if (OPENSSL_init_ssl(OPENSSL_INIT_LOAD_CONFIG |
+						 OPENSSL_INIT_LOAD_SSL_STRINGS |
 						 OPENSSL_INIT_LOAD_CRYPTO_STRINGS, 
 						 NULL) != 1) {
-		throw std::runtime_error("OPENSSL_init_ssl() failed" + std::to_string(ERR_get_error()));
+		throw std::runtime_error("OPENSSL_init_ssl() failed" + std::string(ERR_error_string(ERR_get_error(), nullptr)));
 	}
 		
 	if (OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS | 
 							OPENSSL_INIT_ADD_ALL_CIPHERS | 
 							OPENSSL_INIT_ADD_ALL_DIGESTS, 
 							NULL) != 1) {
-		throw std::runtime_error("OPENSSL_init_crypto() failed" + std::to_string(ERR_get_error()));
+		throw std::runtime_error("OPENSSL_init_crypto() failed" + std::string(ERR_error_string(ERR_get_error(), nullptr)));
 	}
 
 
@@ -50,28 +51,55 @@ void HttpServer::_ssl_init() {
 
 	//Checking ssl_context_
 	if (!ssl_context_)
-		throw std::runtime_error("SSL_CTX_new() failed" + std::to_string(ERR_get_error()));
+		throw std::runtime_error("SSL_CTX_new() failed" + std::string(ERR_error_string(ERR_get_error(), nullptr)));
 
-	SSL_CTX_set_cipher_list(ssl_context_.get(), "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256");
-	SSL_CTX_set_min_proto_version(ssl_context_.get(), TLS1_3_VERSION);// Disable obsolete protocols
 
+	SSL_CTX_set_min_proto_version(ssl_context_.get(), TLS1_3_VERSION);
+	SSL_CTX_set_max_proto_version(ssl_context_.get(), TLS1_3_VERSION);// Disable obsolete protocols
+
+	SSL_CTX_set_session_cache_mode(ssl_context_.get(), SSL_SESS_CACHE_SERVER);
+	SSL_CTX_set_timeout(ssl_context_.get(), 3600);
+
+	////Шифры под вопросом! Уточнить в интернете
+	
+	//const char* tls13_ciphers = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256";
+	//// Ваша проблемная строка (окружите ее try-catch на всякий случай, хотя AV обычно не ловится стандартными C++ catch)
+	//try {
+	//	if (SSL_CTX_set_ciphersuites(ssl_context_.get(), tls13_ciphers) != 1) {
+	//		unsigned long err_code = ERR_get_error();
+	//		char err_buf[256];
+	//		ERR_error_string_n(err_code, err_buf, sizeof(err_buf));
+	//		std::string error_message = "SSL_CTX_set_ciphersuites(NULL) failed: " + std::string(err_buf);
+	//		std::cerr << "[ERROR] " << error_message << std::endl;
+	//		throw std::runtime_error(error_message);
+	//	}
+	//}
+	//catch (const std::runtime_error& e) {
+	//	std::cerr << "Caught runtime_error around SSL_CTX_set_ciphersuites: " << e.what() << std::endl;
+	//	throw; // Перебрасываем дальше, если нужно
+	//}
+	//catch (...) {
+	//	std::cerr << "Caught unknown exception around SSL_CTX_set_ciphersuites" << std::endl;
+	//	// Access Violation обычно здесь не поймается, но на всякий случай
+	//	throw;
+	//}
 
 	// set the local certificate from certFile
 	if (SSL_CTX_use_certificate_file(ssl_context_.get(), certificatePath_.c_str(), SSL_FILETYPE_PEM) <= 0) 
-		throw std::runtime_error("Failed to load certificate key" + std::to_string(ERR_get_error()));
+		throw std::runtime_error("Failed to load certificate key" + std::string(ERR_error_string(ERR_get_error(), nullptr)));
 
 	// set the local key from keyFile
 	if (SSL_CTX_use_PrivateKey_file(ssl_context_.get(), keyPath_.c_str(), SSL_FILETYPE_PEM) <= 0) 
-		throw std::runtime_error("Failed to load private key" + std::to_string(ERR_get_error()));
+		throw std::runtime_error("Failed to load private key" + std::string(ERR_error_string(ERR_get_error(), nullptr)));
 
 	// check private key and certificate
 	if (!SSL_CTX_check_private_key(ssl_context_.get())) 
-		throw std::runtime_error("SSL_CTX_check_private_key() failed" + std::to_string(ERR_get_error()));
+		throw std::runtime_error("SSL_CTX_check_private_key() failed" + std::string(ERR_error_string(ERR_get_error(), nullptr)));
 
 	// set CA certificate from ca_certFile if not empty
 	if (!caPath_.empty()) {
 		if (SSL_CTX_load_verify_locations(ssl_context_.get(), caPath_.c_str(), nullptr) == 0) {
-			throw std::runtime_error("Failed to load CA certificates" + std::to_string(ERR_get_error()));
+			throw std::runtime_error("Failed to load CA certificates" + std::string(ERR_error_string(ERR_get_error(), nullptr)));
 		}
 		//SSL_CTX_set_verify(ssl_context_, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, nullptr);
 		SSL_CTX_set_verify(ssl_context_.get(), SSL_VERIFY_NONE, nullptr); //// For test
@@ -112,24 +140,68 @@ void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) 
 		return;
 	}
 
+
 	SSL_set_fd(ssl.get(), sock_cli);
 
+	timeval timeout { 5, 0 };
+	setsockopt(sock_cli, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
 
-	while (true) {
-		int ret = SSL_accept(ssl.get());
-		if (ret == 1) break; // Успех
-		int error = SSL_get_error(ssl.get(), ret);
-		if (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE) {
-			// Повторить SSL_accept позже.
-			continue;
-		}
-		else {
-			// Обработать ошибку.
-			break;
-		}
-	}
+	int ret;
+	do {
+		ret = SSL_accept(ssl.get());
+		if (ret <= 0) {
+			int err = SSL_get_error(ssl.get(), ret);
+			if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
+				fd_set read_fds, write_fds;
+				FD_ZERO(&read_fds);
+				FD_ZERO(&write_fds);
 
-	char buf[1024];
+				int sock = SSL_get_fd(ssl.get()); // Получаем дескриптор сокета из SSL
+				timeval timeout{ 5, 0 }; // Таймаут 5 секунд
+
+				// Настраиваем нужные сеты для select()
+				if (err == SSL_ERROR_WANT_READ) {
+					FD_SET(sock, &read_fds);
+				}
+				else {
+					FD_SET(sock, &write_fds);
+				}
+
+				// Ждем готовности сокета
+				int select_ret = select(sock + 1,
+					&read_fds,
+					&write_fds,
+					nullptr,
+					&timeout);
+
+				if (select_ret == 0) {
+					// Таймаут
+					std::cerr << "SSL handshake timeout" << std::endl;
+					break;
+				}
+				else if (select_ret < 0) {
+					// Ошибка select()
+					std::cerr << "select() error: " << strerror(errno) << std::endl;
+					break;
+				}
+
+				// Пробуем снова выполнить SSL_accept
+				ret = SSL_accept(ssl.get());
+				continue;
+			}
+			else {
+				unsigned long ssl_err = ERR_get_error();
+				std::cerr << "Fatal SSL error: "
+					<< ERR_error_string(ssl_err, nullptr)
+					<< std::endl;
+				break;
+			}
+		}
+	} while (ret <= 0);
+
+	
+
+	char buf[4096];
 	int err = SSL_read(ssl.get(), buf, sizeof(buf) - 1);
 
 	if (err > 0) {
@@ -149,16 +221,31 @@ void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) 
 			"Content-Length: " + std::to_string(json_response.size()) + "\r\n"
 			"\r\n";
 
+		int bytes_written;
+
 		// Отправка заголовков и JSON-ответа
-		int ret = SSL_write(ssl.get(), headers.c_str(), headers.size());
-		if (ret <= 0)
-			int error = SSL_get_error(ssl.get(), ret);
+		bytes_written = SSL_write(ssl.get(), headers.c_str(), headers.size());
+		if (bytes_written <= 0) {
+			int ssl_err = SSL_get_error(ssl.get(), bytes_written);
+			std::cerr << "SSL_write (headers) failed: " << ERR_error_string(ssl_err, nullptr) << std::endl;
+			// Здесь нужно решить, что делать: закрыть соединение, повторить и т.д.
+			// Для простоты, пока можно закрыть:
+			 SSL_shutdown(ssl.get()); // Попытаться корректно завершить SSL
+			 closesocket(sock_cli);
+			 return;
+		}
 
-		SSL_write(ssl.get(), json_response.c_str(), json_response.size());
-		if (ret <= 0)
-			int error = SSL_get_error(ssl.get(), ret);
+		bytes_written = SSL_write(ssl.get(), json_response.c_str(), json_response.size());
+		if (bytes_written <= 0) {
+			int ssl_err = SSL_get_error(ssl.get(), bytes_written);
+			std::cerr << "SSL_write (headers) failed: " << ERR_error_string(ssl_err, nullptr) << std::endl;
+			// Здесь нужно решить, что делать: закрыть соединение, повторить и т.д.
+			// Для простоты, пока можно закрыть:
+			 SSL_shutdown(ssl.get()); // Попытаться корректно завершить SSL
+			 closesocket(sock_cli);
+			 return;
+		}
 		
-
 		std::cout << "Response sent to client:\n"
 			<< headers << json_response << std::endl;
 	}
@@ -193,6 +280,7 @@ bool HttpServer::start() {
 
 		is_running_ = true;
 		std::cout << "Server started on port " << port_ << std::endl;
+
 
 		while (is_running_) {
 			fd_set read_fds;
@@ -311,6 +399,3 @@ double HttpServer::_processingParameters(std::unordered_map<std::string, std::st
 	return result;
 }
 //------------------------------------------------------------------------------------------
-void HttpServer::readErrorCode(int error) {
-
-}
