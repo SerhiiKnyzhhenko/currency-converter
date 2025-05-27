@@ -1,4 +1,5 @@
 #include "Socket.hpp"
+#include <iostream>
 
 // Constructor: initializes Winsock and creates a socket
 Socket::Socket(int domain = AF_INET, Type type = Type::TCP) {
@@ -17,6 +18,20 @@ Socket::Socket(int domain = AF_INET, Type type = Type::TCP) {
 			"socket() failed"
 		);
 	}
+
+	// Устанавливаем неблокирующий режим
+	u_long mode = 1; // 1 = non-blocking, 0 = blocking
+	if (ioctlsocket(socket_, FIONBIO, &mode) != 0) {
+		closesocket(socket_);
+		throw std::system_error(
+			WSAGetLastError(),
+			std::system_category(),
+			"Failed to set non-blocking mode"
+		);
+	}
+
+	// Для отладки (опционально)
+	std::cout << "Socket created in non-blocking mode" << std::endl;
 }
 //------------------------------------------------------------------------------------------
 // Destructor: closes the socket if valid

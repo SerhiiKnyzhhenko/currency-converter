@@ -20,13 +20,13 @@ HttpServer::HttpServer(int port) : port_(port) {
 	}
 	catch (const std::exception& e) {
 		std::cerr << "[ERROR] Initialization failed: " << e.what() << std::endl;
-		throw;
+		throw std::runtime_error("Critical initialization error");
 	}
 }
 //------------------------------------------------------------------------------------------
 HttpServer::~HttpServer() {
-	std::cout << "The server stopped working\n";
-	std::cout << "Number of connections to the server" + getRequestCount_ << std::endl;
+	std::cout << "Server stopped\n";
+	std::cout << "Total connections handled: " << getRequestCount_ << "\n";
 }
 //------------------------------------------------------------------------------------------
 void HttpServer::_ssl_init() {
@@ -114,15 +114,23 @@ void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) 
 
 	SSL_set_fd(ssl.get(), sock_cli);
 
-	int err = SSL_accept(ssl.get());
-	if (err <= 0) {
-		ERR_print_errors_fp(stderr);
-		closesocket(sock_cli);
-		return;
+
+	while (true) {
+		int ret = SSL_accept(ssl.get());
+		if (ret == 1) break; // Успех
+		int error = SSL_get_error(ssl.get(), ret);
+		if (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE) {
+			// Повторить SSL_accept позже.
+			continue;
+		}
+		else {
+			// Обработать ошибку.
+			break;
+		}
 	}
 
 	char buf[1024];
-	err = SSL_read(ssl.get(), buf, sizeof(buf) - 1);
+	int err = SSL_read(ssl.get(), buf, sizeof(buf) - 1);
 
 	if (err > 0) {
 		buf[err] = '\0';
@@ -142,8 +150,14 @@ void HttpServer::_client_processing(int sock_cli, const std::string& client_ip) 
 			"\r\n";
 
 		// Отправка заголовков и JSON-ответа
-		SSL_write(ssl.get(), headers.c_str(), headers.size());
+		int ret = SSL_write(ssl.get(), headers.c_str(), headers.size());
+		if (ret <= 0)
+			int error = SSL_get_error(ssl.get(), ret);
+
 		SSL_write(ssl.get(), json_response.c_str(), json_response.size());
+		if (ret <= 0)
+			int error = SSL_get_error(ssl.get(), ret);
+		
 
 		std::cout << "Response sent to client:\n"
 			<< headers << json_response << std::endl;
@@ -181,33 +195,42 @@ bool HttpServer::start() {
 		std::cout << "Server started on port " << port_ << std::endl;
 
 		while (is_running_) {
-			struct sockaddr_in sa_cli {};
-			socklen_t client_len = sizeof(sa_cli);
+			fd_set read_fds;
+			FD_ZERO(&read_fds);
+			FD_SET(socket_->getFd(), &read_fds);
 
-			/* Socket for a TCP/IP connection is created */
-			SOCKET sock_cli = accept(socket_->getFd(), (struct sockaddr*)&sa_cli, &client_len);
+			timeval timeout{ 1, 0 };
+			int activity = select(socket_->getFd() + 1, &read_fds, nullptr, nullptr, &timeout);
 
-			if (!is_running_) break;
-
-
-			if (sock_cli == INVALID_SOCKET) {
-				throw std::system_error(
-					WSAGetLastError(),
-					std::system_category(),
-					"accept() failed"
-				);
+			if (activity < 0) {
+				throw std::system_error(WSAGetLastError(), std::system_category(), "select() failed");
 			}
+			else if (activity > 0) {
+				struct sockaddr_in sa_cli {};
+				socklen_t client_len = sizeof(sa_cli);
+				SOCKET sock_cli = accept(socket_->getFd(), (struct sockaddr*)&sa_cli, &client_len);
 
-			std::thread([this, sock_cli, sa_cli]() {
-				char client_ip[INET_ADDRSTRLEN];
-				inet_ntop(AF_INET, &sa_cli.sin_addr, client_ip, INET_ADDRSTRLEN);
+				if (!is_running_) break;
 
-				std::cout << "Connection from " << client_ip
-					<< ":" << ntohs(sa_cli.sin_port) << std::endl;
+				if (sock_cli == INVALID_SOCKET) {
+					throw std::system_error(
+						WSAGetLastError(),
+						std::system_category(),
+						"accept() failed");
+				}
+				else {
+					std::thread([this, sock_cli, sa_cli]() {
+						char client_ip[INET_ADDRSTRLEN];
+						inet_ntop(AF_INET, &sa_cli.sin_addr, client_ip, INET_ADDRSTRLEN);
 
-				_client_processing(sock_cli, client_ip);
-				getRequestCount_ += 1;
-				}).detach();
+						std::cout << "Connection from " << client_ip
+							<< ":" << ntohs(sa_cli.sin_port) << std::endl;
+
+						_client_processing(sock_cli, client_ip);
+						getRequestCount_ += 1;
+						}).detach();
+				}
+			}	
 		}
 	}
 	catch (const std::system_error& e) {
@@ -247,7 +270,7 @@ double HttpServer::_parsingRequest(const std::string& request) {
 	}
 	return _processingParameters(params);
 }
-
+//------------------------------------------------------------------------------------------
 double HttpServer::_processingParameters(std::unordered_map<std::string, std::string>& params) {
 	double result = 0;
 
@@ -286,4 +309,8 @@ double HttpServer::_processingParameters(std::unordered_map<std::string, std::st
 	}
 		
 	return result;
+}
+//------------------------------------------------------------------------------------------
+void HttpServer::readErrorCode(int error) {
+
 }

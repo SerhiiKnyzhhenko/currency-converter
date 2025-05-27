@@ -66,9 +66,7 @@ private:
 	void _socket_init();
 	void _client_processing(int, const std::string&);
 
-public:
-	HttpServer(int port = 443);
-	~HttpServer();
+	void readErrorCode(int err);
 
 	void _setCertPath(const std::string&);
 	void _setKeyPath(const std::string&);
@@ -76,6 +74,10 @@ public:
 
 	double _parsingRequest(const std::string& request);
 	double _processingParameters(std::unordered_map<std::string, std::string>& params);
+
+public:
+	HttpServer(int port = 443);
+	~HttpServer();
 
 	bool start();
 };
